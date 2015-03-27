@@ -1,80 +1,82 @@
-import java.awt.Point;
+
 
 
 public class Body {
 
-	private double mass;
-	private double xVelocity;
-	private double yVelocity;
-	private double zVelocity;
-	private Point position;
-	// should be a tuple, not sure how to make that happen w/o google
-	private Point force;
-	static double G;
+	private double radius;
+	private double[] velocity = new double[3];	
+	//take the assumption that the position is the center of the ball
+	private double[] position = new double[3];
 	
-	//TODO is it worthwhile to have
-	//a storage of forces and distnaces from one body to all the others?
-	public Body(double mass,
+	public Body(double radius,
 			double velocity_x,
 			double velocity_y,
 			double zVelocity,
-			Point position )
+			double[] position )
 	{
-		this.mass = mass;
-		this.zVelocity = zVelocity;
-		this.xVelocity= velocity_x;
-		this.yVelocity = velocity_y;
+		this.radius = radius;
+		velocity[0] = velocity_x;
+		velocity[1] = velocity_y;
+		velocity[2] = zVelocity;
 		this.position = position;
 		
 	}
 
 	public void setZVelocity(double z){
-		this.zVelocity = z;
+		velocity[2] = z;
 	}
 	
 	public double getZvelocity(){
-		return zVelocity;
+		return velocity[2];
 	}
 	
-	public double getMass() {
-		return mass;
+	public double getRadius() {
+		return radius;
 	}
 
-	public void setMass(double mass) {
-		this.mass = mass;
+	public void setRadius(double radius) {
+		this.radius = radius;
 	}
 
 	public double getXVelocity() {
-		return xVelocity;
+		return velocity[0];
 	}
 
 	public void setXVelocity(double velocity_x) {
-		this.xVelocity = velocity_x;
+		this.velocity[0] = velocity_x;
 	}
 
 	public double getYVelocity() {
-		return yVelocity;
+		return velocity[1];
 	}
 
 	public void setYVelocity(double velocity_y) {
-		this.yVelocity = velocity_y;
+		this.velocity[1] = velocity_y;
 	}
 
-	public Point getPosition() {
-		return position;
+	public double getXPosition() {
+		return position[0];
 	}
 
-	public void setPosition(Point position) {
-		this.position = position;
+	public void setXPosition(double p) {
+		position[0] = p;
+	}
+	
+	public double getYPosition() {
+		return position[1];
 	}
 
-	public Point getForce() {
-		return force;
+	public void setYPosition(double p) {
+		position[1] = p;
+	}
+	public double getZPosition() {
+		return position[2];
 	}
 
-	public void setForce(Point force) {
-		this.force = force;
-	}
+	public void setZPosition(double p) {
+		position[2] = p;
+
+	
 
 	
 	
