@@ -40,7 +40,7 @@ public class NBodies {
 
 		// create the threads
 		for (int i = 0; i < numWorkers; i++) {
-			workers[i] = new Computator(bodies, numSteps, i, numWorkers);
+			workers[i] = new Computator(numSteps, i, numWorkers);
 		}
 		
 		midTime = new Date();

@@ -26,7 +26,7 @@ public class Computator extends Thread {
 	public double calcForce(Body b1, Body b2) {
 
 		double radius = calcDistance(b1, b2);
-		double force = G / (radius * radius);
+		double force = Constants.G / (radius * radius);
 		
 		return force;
 	}
