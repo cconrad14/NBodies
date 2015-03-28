@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 
 public class Computator extends Thread {
-	// how to exponent in java?
 
 	static ArrayList<Body> _bodies;
 	
@@ -32,16 +31,7 @@ public class Computator extends Thread {
 	}
 
 	public void run() {
-
-		for (; currentStep < timeSteps; currentStep++) {
-			update();
-			checkForCollision();
-			barrier();
-			while(collision) {
-				
-			}
-			
-		}
+		
 	}
 
 	public double calcDistance(Body b1, Body b2) {
@@ -86,6 +76,8 @@ public class Computator extends Thread {
 	// if true, then calls
 	public boolean checkForCollision() {
 
+		
+		
 		return false;
 	}
 

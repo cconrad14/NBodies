@@ -3,11 +3,14 @@
 
 public class Body {
 
-	private double radius;
-	private double[] velocity = new double[3];	
+	private double radius = 1;
+	private double mass = 1;
+	
+	private double[] deltaAccel = new double[3];
+	private double[] velocity = new double[3];
+	
 	//take the assumption that the position is the center of the ball
 	private double[] position = new double[3];
-	private boolean hasCollided = false;
 	
 	public Body(double radius,
 			double velocity_x,
@@ -79,11 +82,19 @@ public class Body {
 		position[2] = p;
 	}
 	
-	public void changeCollision(){
-		hasCollided = !hasCollided;
+	public double distance(Body other) {
+		double xDiff = position[0] - other.position[0];
+		double yDiff = position[1] - other.position[1];
+		double zDiff = position[2] - other.position[2];		
+		return Math.sqrt(xDiff*xDiff + yDiff*yDiff + zDiff*zDiff);
 	}
-
 	
-	
-	
+	public void updateTimestepAccel(Body other) {
+		double d = distance(other);
+		
+		for(int i = 0; i < 3; i++) {
+			double a = Constants.G * other.mass * (position[i] - other.position[i]);
+			deltaAccel[i] += a / (d * d * d);
+		}
+	}
 }
