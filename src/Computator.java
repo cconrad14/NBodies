@@ -1,17 +1,22 @@
+import java.util.ArrayList;
+
 public class Computator extends Thread {
 	// how to exponent in java?
 
-	double G = .0000000000667; // units and things!
-	private static Body[] bodies;
+	static ArrayList<Body> _bodies;
+	
+	static {
+		_bodies = new ArrayList<Body>();
+	}
+
 	private int timeSteps;
 	private int currentStep = 0;
 	private int myID;
 	private int numWorkers;
 	private boolean collision = false;
 
-	public Computator(Body[] bodies, int timeSteps, int id, int workers) {
+	public Computator(int timeSteps, int id, int workers) {
 		this.timeSteps = timeSteps;
-		this.bodies = bodies;
 		myID = id;
 		numWorkers = workers;
 	}
@@ -21,6 +26,7 @@ public class Computator extends Thread {
 
 		double radius = calcDistance(b1, b2);
 		double force = G / (radius * radius);
+		
 		return force;
 	}
 
@@ -30,7 +36,7 @@ public class Computator extends Thread {
 			update();
 			checkForCollision();
 			barrier();
-			while(collision){
+			while(collision) {
 				
 			}
 			
@@ -51,12 +57,12 @@ public class Computator extends Thread {
 	}
 
 	private void update() {
-		int mine = bodies.length / numWorkers;
+		int mine = _bodies.size() / numWorkers;
 		int lowerBody, upperBody;
 		lowerBody = mine * myID;
 
 		if (myID == numWorkers - 1) {
-			upperBody = bodies.length;
+			upperBody = _bodies.size();
 		} else {
 			upperBody = lowerBody + mine;
 		}
