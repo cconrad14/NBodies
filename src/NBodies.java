@@ -42,6 +42,7 @@ public class NBodies {
 		for (int i = 0; i < numWorkers; i++) {
 			workers[i] = new Computator(bodies, numSteps, i, numWorkers);
 		}
+		
 		midTime = new Date();
 		double mid = midTime.getTime();
 		// run the threads!!

@@ -7,6 +7,7 @@ public class Body {
 	private double[] velocity = new double[3];	
 	//take the assumption that the position is the center of the ball
 	private double[] position = new double[3];
+	private boolean hasCollided = false;
 	
 	public Body(double radius,
 			double velocity_x,
@@ -69,14 +70,18 @@ public class Body {
 	public void setYPosition(double p) {
 		position[1] = p;
 	}
+	
 	public double getZPosition() {
 		return position[2];
 	}
 
 	public void setZPosition(double p) {
 		position[2] = p;
-
+	}
 	
+	public void changeCollision(){
+		hasCollided = !hasCollided;
+	}
 
 	
 	

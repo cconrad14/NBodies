@@ -7,6 +7,7 @@ public class Computator extends Thread {
 	private int currentStep = 0;
 	private int myID;
 	private int numWorkers;
+	private boolean collision = false;
 
 	public Computator(Body[] bodies, int timeSteps, int id, int workers) {
 		this.timeSteps = timeSteps;
@@ -26,7 +27,13 @@ public class Computator extends Thread {
 	public void run() {
 
 		for (; currentStep < timeSteps; currentStep++) {
-
+			update();
+			checkForCollision();
+			barrier();
+			while(collision){
+				
+			}
+			
 		}
 	}
 
@@ -54,14 +61,23 @@ public class Computator extends Thread {
 			upperBody = lowerBody + mine;
 		}
 		for (int i = lowerBody; i < upperBody; i++) {
-
+			
 		}
 
 	}
+	
+	public void findCollisionLocation(){
+		
+	}
+	
+	public void calcCollision(){
+		
+	}
 
+	
 	// checks for a collision with the closest object to it
 	// if true, then calls
-	public boolean checkForCollision(Body b1) {
+	public boolean checkForCollision() {
 
 		return false;
 	}
