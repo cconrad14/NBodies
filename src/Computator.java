@@ -8,6 +8,7 @@ public class Computator extends Thread {
 	private int myID;
 	private int numWorkers;
 	private boolean collision = false;
+	private static TimeKeeper time = new TimeKeeper();
 
 	public Computator(Body[] bodies, int timeSteps, int id, int workers) {
 		this.timeSteps = timeSteps;
