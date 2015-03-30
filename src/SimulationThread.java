@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 
 public abstract class SimulationThread implements Runnable {
@@ -6,10 +7,12 @@ public abstract class SimulationThread implements Runnable {
 	// static vars required during run time
 	protected static ArrayList<Body> _bodies;
 	protected static float _timestep;
+	protected static ArrayList<Semaphore> _sems;
 	
 	static {
 		_bodies = new ArrayList<Body>();
 		_timestep = 0.001f;
+		_sems = new ArrayList<Semaphore>();
 	}
 	
 	// instance vars

@@ -10,7 +10,8 @@ public class Body {
 	private double[] velocity = new double[3];
 	
 	//take the assumption that the position is the center of the ball
-	private double[] position = new double[3];
+	private double[] position;
+	public double[] nextPosition = new double[3];
 	
 	public Body(double radius,
 			double velocity_x,
@@ -24,6 +25,11 @@ public class Body {
 		velocity[2] = zVelocity;
 		this.position = position;
 		
+	}
+	
+	
+	public double[] getAccel(){
+		return deltaAccel;
 	}
 
 	public void setZVelocity(double z){
@@ -95,6 +101,13 @@ public class Body {
 		for(int i = 0; i < 3; i++) {
 			double a = Constants.G * other.mass * (position[i] - other.position[i]);
 			deltaAccel[i] += a / (d * d * d);
+		}
+	}
+	
+	public void move(){
+		for(int i = 0; i < 3; i++){
+			nextPosition[i] = position[i] + velocity[i] + deltaAccel[i] / 2;
+			velocity[i] += deltaAccel[i];
 		}
 	}
 }
