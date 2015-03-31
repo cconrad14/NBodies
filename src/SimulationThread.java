@@ -6,13 +6,15 @@ public abstract class SimulationThread implements Runnable {
 
 	// static vars required during run time
 	protected static ArrayList<Body> _bodies;
-	protected static float _timestep;
 	protected static ArrayList<Semaphore> _sems;
+	protected static float _timestep = 0.001f;
+	protected static float _frameRate = 1.0f / 15.0f;
+	protected static TimeKeeper _tk;
 	
 	static {
 		_bodies = new ArrayList<Body>();
-		_timestep = 0.001f;
 		_sems = new ArrayList<Semaphore>();
+		_tk = new TimeKeeper();
 	}
 	
 	// instance vars

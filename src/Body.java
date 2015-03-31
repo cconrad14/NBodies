@@ -1,3 +1,5 @@
+import java.util.Stack;
+
 
 
 
@@ -12,6 +14,8 @@ public class Body {
 	//take the assumption that the position is the center of the ball
 	private double[] position;
 	public double[] nextPosition = new double[3];
+	
+	private Stack<Body> _stackCollision = new Stack<Body>();
 	
 	public Body(double radius,
 			double velocity_x,
@@ -109,5 +113,23 @@ public class Body {
 			nextPosition[i] = position[i] + velocity[i] + deltaAccel[i] / 2;
 			velocity[i] += deltaAccel[i];
 		}
+	}
+	
+	public void pushBodyOnCollisionStack(Body other) {
+		_stackCollision.push(other);
+	}
+	
+	public Body popBodyOffCollisionStack() {
+		return _stackCollision.pop();
+	}
+	
+	public float ComputeCollisionTime(
+			Body b1,
+			Body b2) {
+		float collide;
+		
+		
+		
+		return collide;
 	}
 }

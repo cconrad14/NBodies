@@ -1,6 +1,7 @@
 public class Mover extends SimulationThread {
 
-	static int counter = 0;
+	private static int _barrierCounter = 0;
+	private static float  _collisionSmallestTime = Float.MAX_VALUE;
 	
 	private Mover(int threadId, int numThreads) {
 		super(threadId, numThreads);
@@ -8,19 +9,27 @@ public class Mover extends SimulationThread {
 
 	@Override
 	public void run() {
-		calcChanges(CalculationStrategy.ACCEL);
-		barrier();
-		calcChanges(CalculationStrategy.MOVE);
-		barrier();
-		calcChanges(CalculationStrategy.COLLISION);
-		barrier();
 		
-
+		while(true) {
+			calcChanges(CalculationStrategy.ACCEL);
+			barrier();
+			calcChanges(CalculationStrategy.COLLISION);
+			barrier();
+			calcChanges(CalculationStrategy.MOVE);
+			barrier();
+			
+			if(_threadId == 0) {
+				UpdateGui();
+				_tk.addTime(t);
+				
+			}
+		}		
 	}
 
 	private void calcChanges(CalculationStrategy flag) {
 		int i = 0;
 		while (true) {
+			
 			// do this loop until the index is out of range
 			int idx = mapSequenceToId(i++);
 			if (idx >= _bodies.size())
@@ -29,16 +38,7 @@ public class Mover extends SimulationThread {
 			Body b = _bodies.get(idx);
 			switch (flag) {
 				case ACCEL:
-	
-					loop: for (Body other : _bodies) {
-						double dist = b.distance(other);
-	
-						// TODO skip self, not sure what this break will do
-						if (dist == 0.0)
-							continue loop;
-	
-						b.updateTimestepAccel(other);
-					}
+					ComputeAcceleration(b);
 					break;
 				case MOVE:
 					b.move();
@@ -53,14 +53,32 @@ public class Mover extends SimulationThread {
 		}
 
 	}
+	
+	private void ComputeAcceleration(Body b) {
+		for (Body other : _bodies) {
+			double dist = b.distance(other);
 
-	private boolean checkCollisions() {
-		return false;
+			// TODO skip self, not sure what this break will do
+			if (dist == 0.0)
+				continue;
+
+			b.updateTimestepAccel(other);
+		}
+	}
+
+	private boolean checkCollisions(Body b) {
+		for(Body other : _bodies) {
+			double dist = b.distance(other);
+			if(dist < b.getRadius() + other.getRadius()) {
+				b.pushBodyOnCollisionStack(other);
+				
+			}			
+		}
 	}
 
 	synchronized private void barrier() {
-		counter++;
-		if(counter < _numThreads)
+		_barrierCounter++;
+		if(_barrierCounter < _numThreads)
 			try { wait(); }
 			catch(InterruptedException ie) {
 				System.out.print(ie.getStackTrace());
@@ -68,6 +86,10 @@ public class Mover extends SimulationThread {
 			}
 		else
 			notifyAll();
+	}
+	
+	private void UpdateGui() {
+		
 	}
 
 }
