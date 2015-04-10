@@ -26,8 +26,9 @@ public class NBodies {
 		double radius = Double.parseDouble(args[3]);
 		int numSteps = Integer.parseInt(args[4]);
 		Date startTime, midTime, endTime;
-		Computator[] workers = new Computator[numWorkers];
+		Mover[] workers = new Mover[numWorkers];
 		Body[] bodies = new Body[numBodies];
+		
 		// initialize the bodies!!
 		// TODO where do we place these guys??
 		double[] position = {0.0,0.0,0.0};
@@ -40,13 +41,14 @@ public class NBodies {
 
 		// create the threads
 		for (int i = 0; i < numWorkers; i++) {
-			workers[i] = new Computator(numSteps, i, numWorkers);
+			workers[i] = new Mover(i, numWorkers);
 		}
 		
 		midTime = new Date();
 		double mid = midTime.getTime();
 		// run the threads!!
 		for (int i = 0; i < numWorkers; i++) {
+			//TODO implementing runnable doesnt give you the start method????
 			workers[i].start();
 		}
 		// collect the workers!

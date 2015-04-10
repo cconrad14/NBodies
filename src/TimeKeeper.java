@@ -14,7 +14,7 @@ public class TimeKeeper {
 	 * Adds time to the timekeeper. Assumes t is between 0 and 1!
 	 * @param t
 	 */
-	public void addTime(float t){
+	public void addTime(float t, int m){
 		precision += t;
 		if(precision >= 1){
 			seconds++;

@@ -16,6 +16,8 @@ public class Body {
 	public double[] nextPosition = new double[3];
 	
 	private Stack<Body> _stackCollision = new Stack<Body>();
+	private float _mySmallestFloatTime = 0;
+	private int _mySmallestIntTime = 0;
 	
 	public Body(double radius,
 			double velocity_x,
@@ -126,9 +128,8 @@ public class Body {
 	public float ComputeCollisionTime(
 			Body b1,
 			Body b2) {
-		float collide;
-		
-		
+		float collide = 0; //?????
+				
 		
 		return collide;
 	}

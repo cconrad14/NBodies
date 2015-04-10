@@ -2,8 +2,12 @@ public class Mover extends SimulationThread {
 
 	private static int _barrierCounter = 0;
 	private static float  _collisionSmallestTime = Float.MAX_VALUE;
-	
-	private Mover(int threadId, int numThreads) {
+	private static float _floatMoveTime = 0;
+	private static int _intMoveTime = 0;
+	private static boolean _collisionDetected = false;
+	// where do we assign 
+	// constructor was set to be private but should be public?
+	public Mover(int threadId, int numThreads) {
 		super(threadId, numThreads);
 	}
 
@@ -15,12 +19,13 @@ public class Mover extends SimulationThread {
 			barrier();
 			calcChanges(CalculationStrategy.COLLISION);
 			barrier();
+			_collisionDetected = false;
 			calcChanges(CalculationStrategy.MOVE);
 			barrier();
 			
 			if(_threadId == 0) {
 				UpdateGui();
-				_tk.addTime(t);
+				_tk.addTime(_floatMoveTime, _intMoveTime);
 				
 			}
 		}		
@@ -44,7 +49,13 @@ public class Mover extends SimulationThread {
 					b.move();
 					break;
 				case COLLISION:
-					
+					for(Body other : _bodies){
+						if(b.distance(other) == 0)
+							continue;
+						else
+							checkCollisions(other); // this is calling n^2 - n(n+1)/2 too many collision checks.
+						//TODO reduce the number of repeated checks
+					}
 					break;
 				default:
 					break;
@@ -71,21 +82,24 @@ public class Mover extends SimulationThread {
 			double dist = b.distance(other);
 			if(dist < b.getRadius() + other.getRadius()) {
 				b.pushBodyOnCollisionStack(other);
-				
+				_collisionDetected = true;
 			}			
 		}
+		return _collisionDetected;
 	}
 
 	synchronized private void barrier() {
 		_barrierCounter++;
-		if(_barrierCounter < _numThreads)
+		if(_barrierCounter < _numThreads )
 			try { wait(); }
 			catch(InterruptedException ie) {
 				System.out.print(ie.getStackTrace());
 				System.exit(_threadId);
 			}
-		else
+		else{
+			_barrierCounter = 0;
 			notifyAll();
+		}
 	}
 	
 	private void UpdateGui() {
