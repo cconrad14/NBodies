@@ -18,6 +18,8 @@ public class Body {
 	private Stack<Body> _stackCollision = new Stack<Body>();
 	private float _mySmallestFloatTime = 0;
 	private int _mySmallestIntTime = 0;
+	private double[] normalVector;
+	private double[] tangentVector;
 	
 	public Body(double radius,
 			double velocity_x,
@@ -133,4 +135,70 @@ public class Body {
 		
 		return collide;
 	}
+	
+	public void computeCollision(Body b){
+		// find normal and tangent vectors
+		// tangent vectors will not change
+		
+		
+	}
+	
+	 public void computeNormal( Body b){
+		 double magnitude = distance(b);
+		 normalVector[0] = (this.getXPosition() - b.getXPosition()) / magnitude;
+		 normalVector[1] = (this.getYPosition() - b.getYPosition()) / magnitude;
+		 normalVector[2] = (this.getZPosition() - b.getZPosition()) / magnitude;
+		 
+	 }
+	 
+	 
+	 //switches axis to make the x-axis along the normal vector between the two objects.
+	private void CalcAngle(Body b){
+		double magnitude = distance(b);
+		double distX = this.getXPosition() - b.getXPosition();
+		double distY = this.getYPosition() - b.getYPosition();
+		double distZ = this.getZPosition() - b.getZPosition();
+		double myMag = velocity[0] + velocity[1] + velocity[2];
+		double hisMag = b.velocity[0] + b.velocity[1] + b.velocity[2];
+		double numerator = distX*velocity[0] + distY*velocity[1] + distZ*velocity[2];
+		double denominator =  Math.sqrt((distX + distY + distZ) * myMag);
+		double myAngle = Math.acos(numerator / denominator);
+		numerator = distX*b.velocity[0] + distY*b.velocity[1] + distZ*b.velocity[2];
+		denominator =  Math.sqrt((distX + distY + distZ) * hisMag);
+		double hisAngle = Math.acos(numerator / denominator);
+		double myVCenter = myMag*Math.cos(myAngle);
+		double hisVCenter = hisMag * Math.cos(hisAngle);
+		double myXZ = Math.asin(velocity[2] / velocity[0]); // angle of vector on the xz plane
+		double myXY = Math.asin(velocity[1] / velocity[0]);
+		double hisXZ = Math.asin(b.velocity[2] / b.velocity[0]);
+		double hisXY = Math.asin(b.velocity[1] / b.velocity[0]);
+		double[] myCenter = new double[3];
+		myCenter[0] = myVCenter * Math.sin(myXZ) * Math.cos(myXY);
+		myCenter[1] = myVCenter * Math.sin(myXZ) * Math.sin(myXY);
+		myCenter[2] = myVCenter * Math.cos(myXZ);
+		double[] hisCenter = new double[3];
+		hisCenter[0] = hisVCenter * Math.sin(hisXZ) * Math.cos(hisXY);
+		hisCenter[1] = hisVCenter * Math.sin(hisXZ) * Math.sin(hisXY);
+		hisCenter[2] = hisVCenter * Math.cos(hisXZ);
+		double temp = 0;
+		double[] myNormal = new double[3];
+		double[] hisNormal = new double[3];
+		for(int i = 0; i < 3; i++){
+			myNormal[i] = velocity[i] - myCenter[i];
+			hisNormal[i] = b.velocity[i] - hisCenter[i];
+		}
+		for(int i = 0; i < 3; i++){
+			temp = myCenter[i];
+			myCenter[i] = hisCenter[i];
+			hisCenter[i] = temp;
+		}
+		for(int i = 0; i < 3; i++){
+			velocity[i] = myCenter[i] + myNormal[i];
+			b.velocity[i] = hisCenter[i] + hisNormal[i];
+		}
+		
+	}
+	
+	
+	
 }
