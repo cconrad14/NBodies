@@ -8,12 +8,13 @@ public class Body {
 	private double radius = 1;
 	private double mass = 1;
 	
-	private double[] deltaAccel = new double[3];
-	private double[] velocity = new double[3];
+	private final int DIMENSION = 3;
+	private double[] deltaAccel = new double[DIMENSION];
+	private double[] velocity = new double[DIMENSION];
 	
 	//take the assumption that the position is the center of the ball
 	private double[] position;
-	public double[] nextPosition = new double[3];
+	public double[] nextPosition = new double[DIMENSION];
 	
 	private Stack<Body> _stackCollision = new Stack<Body>();
 	private float _mySmallestFloatTime = 0;
@@ -101,6 +102,17 @@ public class Body {
 		double yDiff = position[1] - other.position[1];
 		double zDiff = position[2] - other.position[2];		
 		return Math.sqrt(xDiff*xDiff + yDiff*yDiff + zDiff*zDiff);
+	}
+
+	public static double Magnitude(
+		double[] vector,
+		int dimension)
+	{
+		double sum = 0;
+		for(int i = 0; i < dimension; i++)
+			sum += vector[i] * vector[];
+
+		return Math.sqrt(sum);
 	}
 	
 	public void updateTimestepAccel(Body other) {
@@ -197,6 +209,58 @@ public class Body {
 			b.velocity[i] = hisCenter[i] + hisNormal[i];
 		}
 		
+	}
+
+	// returns the 3D angle with other.
+	public double CalculateAngleXYZ(
+		Body other)
+	{
+		double distX = this.getXPosition() - b.getXPosition();
+		double distY = this.getYPosition() - b.getYPosition();
+		double distZ = this.getZPosition() - b.getZPosition();
+
+		double numerator = 0.0;
+		numerator += distX * velocity[0];
+		numerator += distY * velocity[1];
+		numerator += distZ * velocity[2];
+
+		double denominator = 0.0;
+		denominator += (distX + distY + distZ);
+		denominator *= (velocity[0] + velocity[1] + velocity[2]);
+		denominator = Math.sqrt(denominator);
+
+		return Math.acos(numerator / denominator);
+	}
+
+	public double CalculateVelocityCenterMagnitude(
+		double xyzAngle)
+	{
+		return Magnitude(velocity, 3) * Math.cos(xyzAngle);
+	}
+
+	public static void DecomposeVelocityCenter(
+		double velocityCenterMagnitude,
+		double[] velocityCenterComponents,
+		int dimension)
+	{
+		if(dimension != DIMENSION)
+			throw new Exception("dimension must match!");
+
+		// x
+		// y
+		// z
+	}
+
+	public static void ComputeVelocityNormal(
+		double[] velocityCenterComponents,
+		double[] velocityNormalComponents,
+		int dimension)
+	{
+		if(dimension != DIMENSION)
+			throw new Exception("dimension must match!");
+
+		for(int i = 0; i < dimension; i++)
+		velocityNormalComponents[i] = velocity[i] - velocityCenterComponents[i];
 	}
 	
 	
