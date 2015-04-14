@@ -15,7 +15,7 @@ public class Body {
 	//take the assumption that the position is the center of the ball
 	private double[] position = new double[DIMENSION];
 	public double[] nextPosition = new double[DIMENSION];
-	
+	public int numCollisions = 0;
 	private Stack<Body> _stackCollision = new Stack<Body>();
 	private float _mySmallestFloatTime = 0;
 	private int _mySmallestIntTime = 0;
@@ -160,7 +160,7 @@ public class Body {
 	 // switches axis to make the x-axis along the normal vector between the two objects.
 	 // only works for objects having same mass for now
 	 public void computeCollision(Body other){
-		
+		numCollisions++;
 		double[] myAngles = CalculateAngles(other);
 		double[] hisAngles = other.CalculateAngles(this);
 		double myVCenter = CalculateVelocityCenterMagnitude(myAngles[0]);

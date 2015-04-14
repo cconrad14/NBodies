@@ -6,6 +6,7 @@ public abstract class SimulationThread implements Runnable {
 
 	// static vars required during run time
 	protected static ArrayList<Body> _bodies;
+	protected boolean _isDone = false;
 	protected static ArrayList<Semaphore> _sems;
 	protected static float _timestep = 0.001f;
 	protected static float _frameRate = 1.0f / 15.0f;
@@ -36,5 +37,13 @@ public abstract class SimulationThread implements Runnable {
 	public static void setTimestep(
 			float step) {
 		_timestep = step;
+	}
+	
+	public static void setBodies(Body b){
+		_bodies.add(b);
+	}
+	
+	public static ArrayList<Body> getBodies(){
+		return _bodies;
 	}
 }

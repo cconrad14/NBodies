@@ -5,16 +5,19 @@ public class Mover extends SimulationThread {
 	private static float _floatMoveTime = 0;
 	private static int _intMoveTime = 0;
 	private static boolean _collisionDetected = false;
+	private static int stepsTaken = 0;
+	private int maxSteps;
 	// where do we assign 
 	// constructor was set to be private but should be public?
-	public Mover(int threadId, int numThreads) {
+	public Mover(int threadId, int numThreads, int max) {
 		super(threadId, numThreads);
+		maxSteps = max;
 	}
 
 	@Override
 	public void run() {
 		
-		while(true) {
+		while(!_isDone) {
 			calcChanges(CalculationStrategy.ACCEL);
 			barrier();
 			calcChanges(CalculationStrategy.COLLISION);
@@ -26,10 +29,11 @@ public class Mover extends SimulationThread {
 			if(_threadId == 0) {
 				UpdateGui();
 				_tk.addTime(_floatMoveTime, _intMoveTime);
+				stepsTaken++;
+				if(maxSteps != 0 && stepsTaken > maxSteps)
+					_isDone = true;
 			}
-			
-			
-		}		
+		}	
 	}
 
 	private void calcChanges(CalculationStrategy flag) {
