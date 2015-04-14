@@ -54,7 +54,7 @@ public class Mover extends SimulationThread {
 				ComputeAcceleration(b);
 				break;
 			case MOVE:
-				b.move();
+				b.move(_timestep);
 				break;
 			case CHECK:
 				for (Body other : _bodies) {

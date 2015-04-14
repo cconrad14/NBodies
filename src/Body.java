@@ -6,7 +6,7 @@ import java.util.Stack;
 public class Body {
 
 	private double radius = 1;
-	private double mass = 1;
+	private double mass = 50000000000.0;
 	
 	private final static int DIMENSION = 3;
 	private double[] deltaAccel = new double[DIMENSION];
@@ -14,7 +14,7 @@ public class Body {
 	
 	//take the assumption that the position is the center of the ball
 	private double[] position = new double[DIMENSION];
-	public double[] nextPosition = new double[DIMENSION];
+	public double[] prevPosition = new double[DIMENSION];
 	public int numCollisions = 0;
 	private Stack<Body> _stackCollision = new Stack<Body>();
 	private float _mySmallestFloatTime = 0;
@@ -143,19 +143,17 @@ public class Body {
 	
 	public void updateTimestepAccel(Body other) {
 		double d = distance(other);
-		double sum = 0;
-
+		
 		for(int i = 0; i < 3; i++) {
-			
 			double a = Constants.G * other.mass * (other.position[i] - position[i]);
 			deltaAccel[i] += a / (d * d * d);
-			sum += deltaAccel[i];
 		}
 	}
 	
-	public void move(){
+	public void move(double timeStep){
 		for(int i = 0; i < 3; i++){
-			nextPosition[i] = position[i] + velocity[i] + deltaAccel[i] / 2;
+			prevPosition[i] = position[i];
+			position[i] = position[i] + velocity[i] * timeStep + deltaAccel[i] * timeStep * timeStep * .5;
 			velocity[i] += deltaAccel[i];
 		}
 	}
@@ -247,9 +245,9 @@ public class Body {
 		Body other)
 	{
 		double toRet[] = new double[3];
-		double distX = this.getXPosition() - other.getXPosition();
-		double distY = this.getYPosition() - other.getYPosition();
-		double distZ = this.getZPosition() - other.getZPosition();
+		double distX = other.getXPosition() - this.getXPosition();
+		double distY = other.getYPosition() - this.getYPosition();
+		double distZ = other.getZPosition() - this.getZPosition();
 
 		double numerator = 0.0;
 		numerator += distX * velocity[0];
@@ -259,7 +257,7 @@ public class Body {
 		double denominator = 0.0;
 		denominator += (distX + distY + distZ);
 		denominator *= (velocity[0] + velocity[1] + velocity[2]);
-		denominator = Math.sqrt(denominator);
+		denominator = Math.sqrt(Math.abs(denominator));
 
 		toRet[0] = Math.acos(numerator / denominator);
 		toRet[1] = Math.asin(velocity[2] / velocity[0]);
