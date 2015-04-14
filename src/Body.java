@@ -22,6 +22,9 @@ public class Body {
 	private double[] normalVector;
 	private double[] tangentVector;
 	public boolean _hasCollided = false;
+	
+	
+	
 	public Body(double radius,
 			double velocity_x,
 			double velocity_y,
@@ -33,7 +36,26 @@ public class Body {
 		velocity[1] = velocity_y;
 		velocity[2] = zVelocity;
 		this.position = position;
+	}
+	
+	/**
+	 * Returns this Body's current state in JSON representation
+	 * @return
+	 */
+	public String toJson()
+	{
+		String ret = "{";
 		
+		ret += "position:";
+		ret += "[";
+		for(int i = 0; i < DIMENSION; i++)
+			ret += String.valueOf(velocity[i]) + ",";
+		ret += "],";
+		
+		ret += "radius:";
+		ret += String.valueOf(radius);
+		
+		return ret + "}";
 	}
 	
 	
