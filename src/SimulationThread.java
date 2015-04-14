@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
 
@@ -6,16 +7,18 @@ public abstract class SimulationThread implements Runnable {
 
 	// static vars required during run time
 	protected static ArrayList<Body> _bodies;
-	protected boolean _isDone = false;
+	protected static boolean _isDone = false;
 	protected static ArrayList<Semaphore> _sems;
 	protected static float _timestep = 0.001f;
 	protected static float _frameRate = 1.0f / 15.0f;
 	protected static TimeKeeper _tk;
+	protected static HashMap<int[], Boolean> _collisionMap;
 	
 	static {
 		_bodies = new ArrayList<Body>();
 		_sems = new ArrayList<Semaphore>();
 		_tk = new TimeKeeper();
+		_collisionMap = new HashMap<int[], Boolean>();
 	}
 	
 	// instance vars
@@ -34,6 +37,9 @@ public abstract class SimulationThread implements Runnable {
 		return (_numThreads * i) + _threadId;
 	}
 	
+	public static boolean CheckIfDone(){
+		return _isDone;
+	}
 	public static void setTimestep(
 			float step) {
 		_timestep = step;
@@ -46,4 +52,37 @@ public abstract class SimulationThread implements Runnable {
 	public static ArrayList<Body> getBodies(){
 		return _bodies;
 	}
+	
+	public static void addToMap(int index1, int index2){
+		int[] key = new int[2];
+		mapIndecies(index1, index2, key);
+		_collisionMap.put(key, true);
+	}
+	
+	public static void clearMap(){
+		_collisionMap.clear();
+	}
+	
+	public static boolean checkCollision(int index1, int index2){
+		int[] check = new int[2];
+		mapIndecies(index1, index2, check);
+		if(_collisionMap.containsKey(check)){
+			_collisionMap.remove(check);
+			return true;
+		} else
+			return false;
+		
+	}
+		
+	private static void mapIndecies(int index1, int index2, int[] fill){
+		if(index1 < index2){
+			fill[0] = index1;
+			fill[1] = index2;
+		} else {
+			fill[0] = index2;
+			fill[1] = index1;
+		}
+		
+	}
+	
 }

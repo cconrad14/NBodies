@@ -29,13 +29,17 @@ public class Body {
 			double velocity_x,
 			double velocity_y,
 			double zVelocity,
-			double[] position )
+			double xPosition,
+			double yP,
+			double zP)
 	{
 		this.radius = radius;
 		velocity[0] = velocity_x;
 		velocity[1] = velocity_y;
 		velocity[2] = zVelocity;
-		this.position = position;
+		position[0] = xPosition;
+		position[1] = yP;
+		position[2] = zP;
 	}
 	
 	/**
@@ -139,10 +143,13 @@ public class Body {
 	
 	public void updateTimestepAccel(Body other) {
 		double d = distance(other);
-		
+		double sum = 0;
+
 		for(int i = 0; i < 3; i++) {
-			double a = Constants.G * other.mass * (position[i] - other.position[i]);
+			
+			double a = Constants.G * other.mass * (other.position[i] - position[i]);
 			deltaAccel[i] += a / (d * d * d);
+			sum += deltaAccel[i];
 		}
 	}
 	
