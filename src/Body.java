@@ -1,5 +1,8 @@
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
 import java.util.UUID;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,6 +23,7 @@ public class Body {
 	public double[] prevPosition = new double[DIMENSION];
 	public int numCollisions = 0;
 	private Stack<Body> _stackCollision = new Stack<Body>();
+	private ArrayList<Body> _stillIntersecting = new ArrayList<Body>();
 	private float _mySmallestFloatTime = 0;
 	private int _mySmallestIntTime = 0;
 	private double[] normalVector;
@@ -395,6 +399,48 @@ public class Body {
 		velocityNormalComponents[i] = velocity[i] - velocityCenterComponents[i];
 	}
 	
+	public void RemoveFromStillIntersecting(Body b) {
+		if(_stillIntersecting.contains(b))
+			_stillIntersecting.remove(b);
+	}
 	
+	public void Collide(Body b)
+	{
+		if(_stillIntersecting.contains(b) || b._stillIntersecting.contains(this))
+			return;
+		
+		// 1) Find C
+		double dx = b.position[0] - position[0];
+		double dy = b.position[1] - position[1];;
+		double dz = b.position[2] - position[2];;
+		
+		// 2) Normalize C
+		double mag = Math.pow(Math.sqrt(dx*dx + dy*dy + dz*dz), -1);
+		dx *= mag;
+		dy *= mag;
+		dz *= mag;
+		
+		// 3) Project this.v onto c in coord frame where b.v = 0
+		// create boost vector
+		double boostX = velocity[0] - b.velocity[0];
+		double boostY = velocity[1] - b.velocity[1];
+		double boostZ = velocity[2] - b.velocity[2];
+		
+		// project boost onto c
+		double projX = boostX * dx;
+		double projY = boostY * dy;
+		double projZ = boostZ * dz;
+		
+		// 4) do final assignment
+		velocity[0] = boostX - projX + b.velocity[0];
+		velocity[1] = boostY - projY + b.velocity[1];
+		velocity[2] = boostZ - projZ + b.velocity[2];
+		b.velocity[0] = projX + b.velocity[0];
+		b.velocity[1] = projY + b.velocity[1];
+		b.velocity[2] = projZ + b.velocity[2];
+		
+		_stillIntersecting.add(b);
+		b._stillIntersecting.add(this);
+	}
 	
 }

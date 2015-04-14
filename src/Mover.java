@@ -68,8 +68,7 @@ public class Mover extends SimulationThread {
 				for (Body other : _bodies) {
 					if (b.distance(other) == 0)
 						continue;
-					else
-						checkCollisions(b, other); // this is calling n^2 -
+					boolean intersecting = checkCollisions(b, other); // this is calling n^2 -
 													// n(n+1)/2 too many
 													// collision checks.
 					// TODO reduce the number of repeated checks
@@ -84,12 +83,13 @@ public class Mover extends SimulationThread {
 						mine[i] = b.velocity[i];
 						his[i] = other.velocity[i];
 					}
-					if (SimulationThread.checkCollision(_bodies.indexOf(b),
-							_bodies.indexOf(other)))
-						b.CcomputeCollision(other);
-						i++;
-						i--;
+					boolean doCollision = SimulationThread.checkCollision(
+							_bodies.indexOf(b),	_bodies.indexOf(other)); 
+					if (doCollision) {
+						//b.CcomputeCollision(other);
+						b.Collide(other);
 					}
+				}
 				break;
 			default:
 				break;
@@ -121,6 +121,10 @@ public class Mover extends SimulationThread {
 					_bodies.indexOf(other));
 			_collisionDetected = true;
 
+		}
+		else {
+			b.RemoveFromStillIntersecting(other);
+			other.RemoveFromStillIntersecting(b);
 		}
 		return _collisionDetected;
 	}

@@ -56,7 +56,7 @@ public abstract class SimulationThread implements Runnable {
 	
 	public static void addToMap(int index1, int index2){
 		String key = mapIndecies(index1, index2);
-		_collisionMap.put(key, true);
+		_collisionMap.put(key, false);
 	}
 	
 	public static void clearMap(){
@@ -66,7 +66,11 @@ public abstract class SimulationThread implements Runnable {
 	public static boolean checkCollision(int index1, int index2){
 		
 		String check = mapIndecies(index1, index2);
-		if(_collisionMap.containsKey(check)){
+		Body b1 = _bodies.get(index1);
+		Body b2 = _bodies.get(index2);
+		boolean intersecting = b1.distance(b2) < (b1.getRadius() + b2.getRadius());
+		
+		if(_collisionMap.containsKey(check)) {
 			_collisionMap.remove(check);
 			return true;
 		} else
@@ -78,9 +82,11 @@ public abstract class SimulationThread implements Runnable {
 		String toRet = "";
 		if(index1 < index2){
 			toRet += Integer.toString(index1);
+			toRet += ",";
 			toRet += Integer.toString(index2);
 		} else {
 			toRet += Integer.toString(index2);
+			toRet += ",";
 			toRet += Integer.toString(index1);
 		}
 		return toRet;
