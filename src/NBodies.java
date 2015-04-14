@@ -21,29 +21,31 @@ public class NBodies {
 		// size of each body (radius)
 		// number of time steps
 
-		int numWorkers = Integer.parseInt(args[1]);
-		int numBodies = Integer.parseInt(args[2]);
-		double radius = Double.parseDouble(args[3]);
-		int numSteps = Integer.parseInt(args[4]);
+		int numWorkers = Integer.parseInt(args[0]);
+		int numBodies = Integer.parseInt(args[1]);
+		double radius = Double.parseDouble(args[2]);
+		int numSteps = Integer.parseInt(args[3]);
 		Date startTime, midTime, endTime;
-		Mover[] workers = new Mover[numWorkers];
+		ArrayList<Mover> workers = new ArrayList<Mover>();
 		
 		
 		// initialize the bodies!!
 		// TODO where do we place these guys??
-		double[] position = {0.0,0.0,0.0};
-		for (int i = 0; i < numBodies; i++) {
+		/*for (int i = 0; i < numBodies; i++) {
 			// reassign positions?
 			SimulationThread.setBodies(new Body(radius, 0.0, 0.0, 0.0, position));
-			
-		}
+			position[0] = 5;
+		}*/
+		SimulationThread.setBodies(new Body(radius, 0.0, 0.0, 0.0, -5.0, 0.0, 0.0));
+		SimulationThread.setBodies(new Body(radius, 0.0, 0.0, 0.0, 5.0, 0.0, 0.0));
 		ArrayList<Body> bodies = SimulationThread.getBodies();
+		SimulationThread.setTimestep(1.0f);
 		startTime = new Date();
 		double start = startTime.getTime();
 
 		// create the threads
 		for (int i = 0; i < numWorkers; i++) {
-			workers[i] = new Mover(i, numWorkers, numSteps);
+			workers.add( new Mover(i, numWorkers, numSteps));
 		}
 		
 		midTime = new Date();
@@ -51,12 +53,17 @@ public class NBodies {
 		// run the threads!!
 		for (int i = 0; i < numWorkers; i++) {
 			//TODO implementing runnable doesnt give you the start method????
-			workers[i].run();
+			workers.get(i).run();
 		}
 		// collect the workers!
 		// need to have a barrier here!
-		while(true){
-			Thread.sleep(1);
+		while(!SimulationThread.CheckIfDone()){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		}
 		
@@ -72,7 +79,9 @@ public class NBodies {
 		//TODO do some output bro!
 		System.out.println("computation time: " + seconds + " milliseconds "+ end);
 		System.out.println(collisions + " total collisions");
-		File file = new File("C:\\Users\\CharlesConrad\\Documents\\school\\Spring 2015\\CSC422 Parallel & distributed programming\\NBodies output.txt");
+		String fileName = System.getProperty("user.dir");
+		fileName += "NBodies ouput";
+		File file = new File(fileName);
 		PrintWriter out;
 		Body list;
 		double xP, yP, zP, xV, yV, zV;
