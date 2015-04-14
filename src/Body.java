@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public class Body {
 
 	private double radius = 1;
-	private double mass = 5000.0;
+	private double mass = 5000000.0;
 	private UUID _id = UUID.randomUUID();
 	
 	private final static int DIMENSION = 3;

@@ -32,7 +32,7 @@ public class Mover extends SimulationThread {
 			_collisionDetected = false;
 			calcChanges(CalculationStrategy.MOVE);
 			barrier();
-
+			
 			if (_threadId == 0) {
 				// attempt gui update
 				try { UpdateGui(); }
@@ -41,7 +41,7 @@ public class Mover extends SimulationThread {
 				}
 				_tk.addTime(_timestep);
 				stepsTaken++;
-				if (maxSteps != 0 && stepsTaken > maxSteps)
+				if (maxSteps != 0 && stepsTaken >= maxSteps)
 					_isDone = true;
 			}
 		}
