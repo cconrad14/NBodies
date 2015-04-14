@@ -10,7 +10,7 @@ public class Body {
 	
 	private final static int DIMENSION = 3;
 	private double[] deltaAccel = new double[DIMENSION];
-	private double[] velocity = new double[DIMENSION];
+	public double[] velocity = new double[DIMENSION];
 	
 	//take the assumption that the position is the center of the ball
 	private double[] position = new double[DIMENSION];
@@ -197,7 +197,7 @@ public class Body {
 		double[] hisCenter = new double[3];
 		try {
 			DecomposeVelocityCenter(myVCenter, myCenter, myAngles[1], myAngles[2], DIMENSION);
-			DecomposeVelocityCenter(myVCenter, myCenter, myAngles[1], myAngles[2], DIMENSION);
+			DecomposeVelocityCenter(hisVCenter, hisCenter, hisAngles[1], hisAngles[2], DIMENSION);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -235,6 +235,91 @@ public class Body {
 		}
 		
 	}
+	 
+	 // another take at computing the collisions
+	 public void CcomputeCollision(Body b){
+		 double distance = distance(b);
+		 double massratio = b.mass/this.mass;
+		 double[] dists = new double[3];
+		 double[] diffV = new double[3];
+		 double[] rotV = new double[3];
+		 dists[0] = b.getXPosition() - this.getXPosition();
+		 dists[1] = b.getYPosition() - this.getYPosition();
+		 dists[2] = b.getZPosition() - this.getZPosition();
+		 diffV[0] = b.getXVelocity() - this.getXVelocity();
+		 diffV[1] = b.getYVelocity() - this.getYVelocity();
+		 diffV[2] = b.getZvelocity() - this.getZvelocity();
+		 
+		 
+		 // but "this" at origin, and boost so that b is resting
+		 double relativeV = 0;
+		 for(int i = 0; i < DIMENSION; i++){
+		 	relativeV += (diffV[i] * diffV[i]);
+		 	diffV[i] = velocity[i] - diffV[i];
+		 }
+		 
+		 // do a rotation for "this" at the origin with  polar coordinates
+		 relativeV = Math.sqrt(relativeV);
+		 double phiV, thetaV, Zangle, theta2, phi2, sintheta, costheta, sinphi, cosphi;
+		 theta2 = Math.acos(dists[2] / distance);
+		 if(dists[0] == 0 && dists[1] == 0)
+			 phi2 = 0.0;
+		 else 
+			 phi2 = Math.atan(dists[1] / dists[0]);
+		 sintheta = Math.sin(theta2);
+		 costheta = Math.cos(theta2);
+		 sinphi = Math.sin(phi2);
+		 cosphi = Math.cos(phi2);
+		 
+		 rotV[0] = costheta*sinphi*diffV[0] + costheta*sinphi*diffV[1] - sintheta*diffV[2];
+		 rotV[1] = cosphi*diffV[1] - sinphi*diffV[0];
+		 rotV[2] = sintheta*cosphi*diffV[0] + sinphi*diffV[1] + costheta*diffV[2];
+		 
+		 Zangle = rotV[2] / relativeV;
+		 if(Zangle > 1)
+			 Zangle = 1;
+		 else if(Zangle < -1)
+			 Zangle = -1;
+		
+		 thetaV = Math.acos(Zangle);
+		 double centerV = distance * Math.sin(thetaV) / (this.radius + b.radius);
+		 
+		 if(rotV[0] == 0 && rotV[1] == 0)
+			 phiV = 0;
+		 else
+			 phiV = Math.atan(rotV[1] / rotV[0]);
+		 
+		 
+		 double alpha, beta, sinbeta, cosbeta, a, dvz2;
+		 double[] mytemp = new double[3];
+		 double[] btemp = new double[3];
+		 alpha = Math.asin(-centerV);
+		 a = Math.tan(thetaV+alpha);
+		 beta = phiV;
+		 sinbeta = Math.sin(beta);
+		 cosbeta = Math.cos(beta);
+		 dvz2 = 2*(rotV[2] + a*(cosbeta * rotV[0] + sinbeta*rotV[1])) / ((1+a*a) * (1+massratio));
+		 
+		 //update velocities
+		 btemp[2] = dvz2;
+		 btemp[0] = a *cosbeta*dvz2;
+		 btemp[1] = a*sinbeta*dvz2;
+		 mytemp[2] = rotV[2] - massratio*btemp[2];
+		 mytemp[0] = rotV[0] - massratio*btemp[0];
+		 mytemp[1] = rotV[1] - massratio*btemp[1];
+		 
+		 // rotate back to euclidean
+		 velocity[0] = costheta*cosphi*mytemp[0] - sinphi*mytemp[1] + sintheta*cosphi*mytemp[2] + b.velocity[0];
+		 velocity[1] = costheta*cosphi*mytemp[0] + cosphi*mytemp[1] + sintheta*sinphi*mytemp[2] + b.velocity[1];
+		 velocity[2] = costheta*mytemp[2] - sintheta*mytemp[0] + b.velocity[2];
+		 
+		 b.velocity[0] = costheta*cosphi*btemp[0] - sinphi*btemp[1] + sintheta*cosphi*btemp[2] + b.velocity[0];
+		 b.velocity[1] = costheta*cosphi*btemp[0] + cosphi*btemp[1] + sintheta*sinphi*btemp[2] + b.velocity[1];
+		 b.velocity[2] = costheta*btemp[2] - sintheta*btemp[0] + b.velocity[2];
+		 
+		 
+	 }
+	 
 
 	
 	// returns double array 
@@ -258,7 +343,8 @@ public class Body {
 		denominator += (distX + distY + distZ);
 		denominator *= (velocity[0] + velocity[1] + velocity[2]);
 		denominator = Math.sqrt(Math.abs(denominator));
-
+		if(denominator < numerator)
+			denominator *= denominator;
 		toRet[0] = Math.acos(numerator / denominator);
 		toRet[1] = Math.asin(velocity[2] / velocity[0]);
 		toRet[2] = Math.asin(velocity[1] / velocity[0]);

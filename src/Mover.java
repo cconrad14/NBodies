@@ -70,11 +70,19 @@ public class Mover extends SimulationThread {
 				}
 				break;
 			case COLLISION:
+				double[] mine = new double[3];
+				double[] his = new double[3];
 				if(_collisionDetected){
 					Body other = b.popBodyOffCollisionStack();
+					for(int j = 0; j < 3; j++){
+						mine[i] = b.velocity[i];
+						his[i] = other.velocity[i];
+					}
 					if (SimulationThread.checkCollision(_bodies.indexOf(b),
 							_bodies.indexOf(other)))
-						b.computeCollision(other);
+						b.CcomputeCollision(other);
+						i++;
+						i--;
 					}
 				break;
 			default:
