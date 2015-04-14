@@ -1,3 +1,5 @@
+
+
 public class Mover extends SimulationThread {
 
 	private static int _barrierCounter = 0;
