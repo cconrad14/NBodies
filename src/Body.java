@@ -8,12 +8,12 @@ public class Body {
 	private double radius = 1;
 	private double mass = 1;
 	
-	private final int DIMENSION = 3;
+	private final static int DIMENSION = 3;
 	private double[] deltaAccel = new double[DIMENSION];
 	private double[] velocity = new double[DIMENSION];
 	
 	//take the assumption that the position is the center of the ball
-	private double[] position;
+	private double[] position = new double[DIMENSION];
 	public double[] nextPosition = new double[DIMENSION];
 	
 	private Stack<Body> _stackCollision = new Stack<Body>();
@@ -21,7 +21,7 @@ public class Body {
 	private int _mySmallestIntTime = 0;
 	private double[] normalVector;
 	private double[] tangentVector;
-	
+	public boolean _hasCollided = false;
 	public Body(double radius,
 			double velocity_x,
 			double velocity_y,
@@ -110,7 +110,7 @@ public class Body {
 	{
 		double sum = 0;
 		for(int i = 0; i < dimension; i++)
-			sum += vector[i] * vector[];
+			sum += vector[i] * vector[i];
 
 		return Math.sqrt(sum);
 	}
@@ -147,14 +147,7 @@ public class Body {
 		
 		return collide;
 	}
-	
-	public void computeCollision(Body b){
-		// find normal and tangent vectors
-		// tangent vectors will not change
-		
-		
-	}
-	
+
 	 public void computeNormal( Body b){
 		 double magnitude = distance(b);
 		 normalVector[0] = (this.getXPosition() - b.getXPosition()) / magnitude;
@@ -164,60 +157,70 @@ public class Body {
 	 }
 	 
 	 
-	 //switches axis to make the x-axis along the normal vector between the two objects.
-	private void CalcAngle(Body b){
-		double magnitude = distance(b);
-		double distX = this.getXPosition() - b.getXPosition();
-		double distY = this.getYPosition() - b.getYPosition();
-		double distZ = this.getZPosition() - b.getZPosition();
-		double myMag = velocity[0] + velocity[1] + velocity[2];
-		double hisMag = b.velocity[0] + b.velocity[1] + b.velocity[2];
-		double numerator = distX*velocity[0] + distY*velocity[1] + distZ*velocity[2];
-		double denominator =  Math.sqrt((distX + distY + distZ) * myMag);
-		double myAngle = Math.acos(numerator / denominator);
-		numerator = distX*b.velocity[0] + distY*b.velocity[1] + distZ*b.velocity[2];
-		denominator =  Math.sqrt((distX + distY + distZ) * hisMag);
-		double hisAngle = Math.acos(numerator / denominator);
-		double myVCenter = myMag*Math.cos(myAngle);
-		double hisVCenter = hisMag * Math.cos(hisAngle);
-		double myXZ = Math.asin(velocity[2] / velocity[0]); // angle of vector on the xz plane
-		double myXY = Math.asin(velocity[1] / velocity[0]);
-		double hisXZ = Math.asin(b.velocity[2] / b.velocity[0]);
-		double hisXY = Math.asin(b.velocity[1] / b.velocity[0]);
+	 // switches axis to make the x-axis along the normal vector between the two objects.
+	 // only works for objects having same mass for now
+	 public void computeCollision(Body other){
+		
+		double[] myAngles = CalculateAngles(other);
+		double[] hisAngles = other.CalculateAngles(this);
+		double myVCenter = CalculateVelocityCenterMagnitude(myAngles[0]);
+		double hisVCenter = CalculateVelocityCenterMagnitude(hisAngles[0]);
+		
 		double[] myCenter = new double[3];
-		myCenter[0] = myVCenter * Math.sin(myXZ) * Math.cos(myXY);
-		myCenter[1] = myVCenter * Math.sin(myXZ) * Math.sin(myXY);
-		myCenter[2] = myVCenter * Math.cos(myXZ);
 		double[] hisCenter = new double[3];
-		hisCenter[0] = hisVCenter * Math.sin(hisXZ) * Math.cos(hisXY);
-		hisCenter[1] = hisVCenter * Math.sin(hisXZ) * Math.sin(hisXY);
-		hisCenter[2] = hisVCenter * Math.cos(hisXZ);
+		try {
+			DecomposeVelocityCenter(myVCenter, myCenter, myAngles[1], myAngles[2], DIMENSION);
+			DecomposeVelocityCenter(myVCenter, myCenter, myAngles[1], myAngles[2], DIMENSION);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		// compute the normal vectors
 		double temp = 0;
 		double[] myNormal = new double[3];
 		double[] hisNormal = new double[3];
 		for(int i = 0; i < 3; i++){
 			myNormal[i] = velocity[i] - myCenter[i];
-			hisNormal[i] = b.velocity[i] - hisCenter[i];
+			hisNormal[i] = other.velocity[i] - hisCenter[i];
 		}
+		// swap the center vectors
 		for(int i = 0; i < 3; i++){
 			temp = myCenter[i];
 			myCenter[i] = hisCenter[i];
 			hisCenter[i] = temp;
 		}
+		
+		// compute the new normal vectors
+		for(int i = 0; i < 3; i++){
+			myNormal[i] = velocity[i] - myCenter[i];
+			hisNormal[i] = other.velocity[i] - hisCenter[i];
+		}
+		
+		// compute the new velocity vectors
+		// this section needs to be synchronized
+		// else we dont change the velocity of the other guy
 		for(int i = 0; i < 3; i++){
 			velocity[i] = myCenter[i] + myNormal[i];
-			b.velocity[i] = hisCenter[i] + hisNormal[i];
+			other.velocity[i] = hisCenter[i] + hisNormal[i];
 		}
 		
 	}
 
-	// returns the 3D angle with other.
-	public double CalculateAngleXYZ(
+	
+	// returns double array 
+	// index 0 is the 3D angle with other.
+	// index 1 is the XZ angle
+	// index 2 is the XY angle 
+	public double[] CalculateAngles(
 		Body other)
 	{
-		double distX = this.getXPosition() - b.getXPosition();
-		double distY = this.getYPosition() - b.getYPosition();
-		double distZ = this.getZPosition() - b.getZPosition();
+		double toRet[] = new double[3];
+		double distX = this.getXPosition() - other.getXPosition();
+		double distY = this.getYPosition() - other.getYPosition();
+		double distZ = this.getZPosition() - other.getZPosition();
 
 		double numerator = 0.0;
 		numerator += distX * velocity[0];
@@ -229,7 +232,12 @@ public class Body {
 		denominator *= (velocity[0] + velocity[1] + velocity[2]);
 		denominator = Math.sqrt(denominator);
 
-		return Math.acos(numerator / denominator);
+		toRet[0] = Math.acos(numerator / denominator);
+		toRet[1] = Math.asin(velocity[2] / velocity[0]);
+		toRet[2] = Math.asin(velocity[1] / velocity[0]);
+		
+		
+		return toRet;
 	}
 
 	public double CalculateVelocityCenterMagnitude(
@@ -241,23 +249,33 @@ public class Body {
 	public static void DecomposeVelocityCenter(
 		double velocityCenterMagnitude,
 		double[] velocityCenterComponents,
-		int dimension)
+		double XZAngle,
+		double XYAngle,
+		int dimension) throws Exception
 	{
 		if(dimension != DIMENSION)
 			throw new Exception("dimension must match!");
 
 		// x
+		velocityCenterComponents[0] = velocityCenterMagnitude * Math.sin(XZAngle) * Math.cos(XYAngle);
 		// y
+		velocityCenterComponents[1] = velocityCenterMagnitude * Math.sin(XZAngle) * Math.sin(XYAngle);
 		// z
+		velocityCenterComponents[2] = velocityCenterMagnitude * Math.cos(XZAngle);
 	}
 
-	public static void ComputeVelocityNormal(
+	public void ComputeVelocityNormal(
 		double[] velocityCenterComponents,
 		double[] velocityNormalComponents,
 		int dimension)
 	{
 		if(dimension != DIMENSION)
-			throw new Exception("dimension must match!");
+			try {
+				throw new Exception("dimension must match!");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		for(int i = 0; i < dimension; i++)
 		velocityNormalComponents[i] = velocity[i] - velocityCenterComponents[i];

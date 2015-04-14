@@ -26,8 +26,9 @@ public class Mover extends SimulationThread {
 			if(_threadId == 0) {
 				UpdateGui();
 				_tk.addTime(_floatMoveTime, _intMoveTime);
-				
 			}
+			
+			
 		}		
 	}
 
@@ -81,6 +82,7 @@ public class Mover extends SimulationThread {
 		for(Body other : _bodies) {
 			double dist = b.distance(other);
 			if(dist < b.getRadius() + other.getRadius()) {
+				b._hasCollided = true;
 				b.pushBodyOnCollisionStack(other);
 				_collisionDetected = true;
 			}			
