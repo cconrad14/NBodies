@@ -1,51 +1,45 @@
-<!doctype html>
-<html>
-<head>
-<script src="three.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - orbit controls</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
 
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-</head>
-<body>
-<script>
+			#info {
+				color:#000;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
 
-    var scene, camera, renderer;
-    var geometry, material, mesh;
+			}
 
-    init();
-    animate();
+			a {
+				color: red;
+			}
+		</style>
+		<script src="static/three.min.js"></script>
+		<script src="static/orbit.js"></script>
+		<script src="static/detector.js"></script>
+		<script src="static/stats.js"></script>
+		<script src="socket.io/socket.io.js"></script>
+	</head>
 
-    function init() {
+	<body>
+		<div id="container"></div>
 
-        scene = new THREE.Scene();
+		<script type="text/javascript" src="static/main.js"></script>
 
-        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-        camera.position.z = 1000;
-
-        geometry = new THREE.BoxGeometry( 200, 200, 200 );
-        material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
-
-        mesh = new THREE.Mesh( geometry, material );
-        scene.add( mesh );
-
-        renderer = new THREE.WebGLRenderer();
-        renderer.setSize( window.innerWidth, window.innerHeight );
-
-        document.body.appendChild( renderer.domElement );
-
-    }
-
-    function animate() {
-
-        requestAnimationFrame( animate );
-
-        mesh.rotation.x += 0.01;
-        mesh.rotation.y += 0.01;
-
-        renderer.render( scene, camera );
-
-    }
-
-</script>
-
-</body>
+	</body>
 </html>
