@@ -36,8 +36,8 @@ public class NBodies {
 			SimulationThread.setBodies(new Body(radius, 0.0, 0.0, 0.0, position));
 			position[0] = 5;
 		}*/
-		SimulationThread.setBodies(new Body(radius, 0.0, 0.0, 0.0, -5.0, 0.0, 0.0));
-		SimulationThread.setBodies(new Body(radius, 0.0, 0.0, 0.0, 5.0, 0.0, 0.0));
+		SimulationThread.setBodies(new Body(radius, 0.0, 0.0, 0.0, -1.1, 0.0, 0.0));
+		SimulationThread.setBodies(new Body(radius, 0.0, 0.0, 0.0, 1.1, 0.0, 0.0));
 		ArrayList<Body> bodies = SimulationThread.getBodies();
 		SimulationThread.setTimestep(1.0f);
 		startTime = new Date();

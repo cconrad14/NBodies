@@ -12,13 +12,13 @@ public abstract class SimulationThread implements Runnable {
 	protected static float _timestep = 0.001f;
 	protected static float _frameRate = 1.0f / 15.0f;
 	protected static TimeKeeper _tk;
-	protected static HashMap<int[], Boolean> _collisionMap;
+	protected static HashMap<String, Boolean> _collisionMap;
 	
 	static {
 		_bodies = new ArrayList<Body>();
 		_sems = new ArrayList<Semaphore>();
 		_tk = new TimeKeeper();
-		_collisionMap = new HashMap<int[], Boolean>();
+		_collisionMap = new HashMap<String, Boolean>();
 	}
 	
 	// instance vars
@@ -54,8 +54,7 @@ public abstract class SimulationThread implements Runnable {
 	}
 	
 	public static void addToMap(int index1, int index2){
-		int[] key = new int[2];
-		mapIndecies(index1, index2, key);
+		String key = mapIndecies(index1, index2);
 		_collisionMap.put(key, true);
 	}
 	
@@ -64,8 +63,8 @@ public abstract class SimulationThread implements Runnable {
 	}
 	
 	public static boolean checkCollision(int index1, int index2){
-		int[] check = new int[2];
-		mapIndecies(index1, index2, check);
+		
+		String check = mapIndecies(index1, index2);
 		if(_collisionMap.containsKey(check)){
 			_collisionMap.remove(check);
 			return true;
@@ -74,15 +73,16 @@ public abstract class SimulationThread implements Runnable {
 		
 	}
 		
-	private static void mapIndecies(int index1, int index2, int[] fill){
+	private static String mapIndecies(int index1, int index2){
+		String toRet = "";
 		if(index1 < index2){
-			fill[0] = index1;
-			fill[1] = index2;
+			toRet += Integer.toString(index1);
+			toRet += Integer.toString(index2);
 		} else {
-			fill[0] = index2;
-			fill[1] = index1;
+			toRet += Integer.toString(index2);
+			toRet += Integer.toString(index1);
 		}
-		
+		return toRet;
 	}
 	
 }
