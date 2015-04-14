@@ -1,3 +1,7 @@
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 
 public class Mover extends SimulationThread {
@@ -126,15 +130,15 @@ public class Mover extends SimulationThread {
 		}
 	}
 
-	private void UpdateGui() {
-		// combine JSON into single array
-		String json = "[";
+	private void UpdateGui() throws JSONException {
+		
+		// pack each body into JSON array
+		JSONArray arr = new JSONArray();
 		for (Body b : _bodies)
-			json += b.toJson() + ",";
-		json += "]";
+			arr.put(b.toJson());
 
 		// send to GUI
-
+		GuiCommunication.Send("update-positions", arr);
 	}
 
 }

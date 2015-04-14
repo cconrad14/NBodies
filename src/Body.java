@@ -1,5 +1,7 @@
 import java.util.Stack;
-
+import java.util.UUID;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 
@@ -7,6 +9,7 @@ public class Body {
 
 	private double radius = 1;
 	private double mass = 1;
+	private UUID _id = UUID.randomUUID();
 	
 	private final static int DIMENSION = 3;
 	private double[] deltaAccel = new double[DIMENSION];
@@ -45,21 +48,19 @@ public class Body {
 	/**
 	 * Returns this Body's current state in JSON representation
 	 * @return
+	 * @throws JSONException 
 	 */
-	public String toJson()
+	public JSONObject toJson() throws JSONException
 	{
-		String ret = "{";
+		JSONObject obj = new JSONObject();
 		
-		ret += "position:";
-		ret += "[";
-		for(int i = 0; i < DIMENSION; i++)
-			ret += String.valueOf(velocity[i]) + ",";
-		ret += "],";
+		obj.put("x", position[0]);
+		obj.put("y", position[1]);
+		obj.put("z", position[2]);
+		obj.put("radius", radius);
+		obj.put("id", _id.toString());
 		
-		ret += "radius:";
-		ret += String.valueOf(radius);
-		
-		return ret + "}";
+		return obj;
 	}
 	
 	

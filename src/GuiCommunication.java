@@ -32,5 +32,8 @@ public class GuiCommunication {
 		catch(Exception e) { e.printStackTrace(); }
 	}
 	
-	public 
+	public static void Send(String event, Object obj)
+	{
+		_socket.emit(event, obj);
+	}
 }
