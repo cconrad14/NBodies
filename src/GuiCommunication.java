@@ -31,4 +31,6 @@ public class GuiCommunication {
 		}
 		catch(Exception e) { e.printStackTrace(); }
 	}
+	
+	public 
 }
