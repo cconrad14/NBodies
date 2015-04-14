@@ -24,16 +24,18 @@ io.on('connection', function(socket) {
 	//////////////////
 	// events
 	//////////////////
+	console.log('new connection!');
+	//console.log(socket);
 
 	// sim -> gui
 	socket.on('update-positions', function(data) {
-		console.log('update-positions');
-		socket.emit('gui-update-positions', data);
+		//console.log('update-positions');
+		io.emit('gui-update-positions', data);
 	});
 
 	// gui -> sim
 	socket.on('pause', function(data) {
 		console.log('pause');
-		socket.emit('sim-pause', data);
+		io.emit('sim-pause', data);
 	});
 });

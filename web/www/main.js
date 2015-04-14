@@ -14,7 +14,11 @@ init();
 render();
 
 
+var bodyHash = {};
+
+
 var socket = io.connect('http://localhost');
+//console.log(socket);
 setupSocketEvents();
 
 
@@ -118,22 +122,33 @@ function addBody(body)
 	var mat = new THREE.MeshBasicMaterial();
 	var mesh = new THREE.Mesh(geo, mat);
 
-	updateBodyPosition(mesh, body.position);
+	updateBodyPosition(mesh, body);
 	scene.add(mesh);
 	bodyHash[body.id] = mesh;
 }
 
-function updateBodyPosition(mesh, position)
+function updateBodyPosition(mesh, body)
 {
-	mesh.position.x = position[0];
-	mesh.position.y = position[1];
-	mesh.position.z = position[2];
+	mesh.position.x = body.x;
+	mesh.position.y = body.y;
+	mesh.position.z = body.z;
 }
 
 function setupSocketEvents() {
 	socket.on('gui-update-positions', function(data) {
 		console.log('gui-update-positions');
-		console.log(data);
+		//console.log(data);
+
+		data.forEach(function(element, index, arr) {
+			var entry = bodyHash[element.id]; 
+			if(typeof entry === 'undefined')
+				addBody(element);
+			else
+				updateBodyPosition(entry, element);
+		});
+
+		// ensure the gui updates
+		render();
 	});
 }
 
