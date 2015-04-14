@@ -28,6 +28,8 @@ public class GuiCommunication {
 				}
 			});
 			
+			// finally, connect the socket!
+			_socket.connect();
 		}
 		catch(Exception e) { e.printStackTrace(); }
 	}

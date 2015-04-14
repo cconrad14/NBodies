@@ -10,7 +10,8 @@ public abstract class SimulationThread implements Runnable {
 	protected static boolean _isDone = false;
 	protected static ArrayList<Semaphore> _sems;
 	protected static float _timestep = 0.001f;
-	protected static float _frameRate = 1.0f / 15.0f;
+	protected static float _frameRate = 1.0f / 10.0f;
+	protected static long _currentFrame = -1;
 	protected static TimeKeeper _tk;
 	protected static HashMap<String, Boolean> _collisionMap;
 	

@@ -8,8 +8,6 @@ public class Mover extends SimulationThread {
 
 	private static int _barrierCounter = 0;
 	private static float _collisionSmallestTime = Float.MAX_VALUE;
-	private static float _floatMoveTime = 0;
-	private static int _intMoveTime = 0;
 	private static boolean _collisionDetected = false;
 	private static int stepsTaken = 0;
 	private int maxSteps;
@@ -36,8 +34,12 @@ public class Mover extends SimulationThread {
 			barrier();
 
 			if (_threadId == 0) {
-				UpdateGui();
-				_tk.addTime(_floatMoveTime, _intMoveTime);
+				// attempt gui update
+				try { UpdateGui(); }
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+				_tk.addTime(_timestep);
 				stepsTaken++;
 				if (maxSteps != 0 && stepsTaken > maxSteps)
 					_isDone = true;
@@ -132,6 +134,9 @@ public class Mover extends SimulationThread {
 
 	private void UpdateGui() throws JSONException {
 		
+		if(_currentFrame == _tk.getCurrentFrame(_frameRate))
+			return;
+		
 		// pack each body into JSON array
 		JSONArray arr = new JSONArray();
 		for (Body b : _bodies)
@@ -139,6 +144,8 @@ public class Mover extends SimulationThread {
 
 		// send to GUI
 		GuiCommunication.Send("update-positions", arr);
+		
+		_currentFrame++;
 	}
 
 }

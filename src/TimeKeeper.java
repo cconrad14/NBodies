@@ -1,8 +1,8 @@
 
 public class TimeKeeper {
 
-	private int seconds;
-	private float precision;
+	private long seconds;
+	private double precision;
 	
 	
 	public TimeKeeper() {
@@ -14,20 +14,28 @@ public class TimeKeeper {
 	 * Adds time to the timekeeper. Assumes t is between 0 and 1!
 	 * @param t
 	 */
-	public void addTime(float t, int m){
+	public void addTime(float t){
 		precision += t;
 		if(precision >= 1){
 			seconds++;
-			precision -= 1.0f;
+			precision -= 1.0;
 		}	
 	}
 	
-	public int getSeconds(){
+	public long getSeconds(){
 		return seconds;
 	}
 	
-	public float getPrecision(){
+	public double getPrecision(){
 		return precision;
+	}
+	
+	public long getCurrentFrame(double frameRate)
+	{
+		double frame = seconds / frameRate;
+		frame += precision / frameRate;
+		
+		return (long)frame;
 	}
 	
 	
