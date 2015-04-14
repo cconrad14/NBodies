@@ -105,6 +105,13 @@ public class Mover extends SimulationThread {
 	}
 	
 	private void UpdateGui() {
+		// combine JSON into single array
+		String json = "[";
+		for(Body b : _bodies)
+			json += b.toJson() + ",";
+		json += "]";
+		
+		// send to GUI
 		
 	}
 
