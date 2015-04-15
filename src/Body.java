@@ -404,6 +404,12 @@ public class Body {
 			_stillIntersecting.remove(b);
 	}
 	
+	public void ClearAccel()
+	{
+		for(int i = 0; i < DIMENSION; i++)
+			deltaAccel[i] = 0.0;
+	}
+	
 	public void Collide(Body b)
 	{
 		if(_stillIntersecting.contains(b) || b._stillIntersecting.contains(this))
