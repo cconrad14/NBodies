@@ -7,21 +7,28 @@ import org.json.JSONObject;
 public class Mover extends SimulationThread {
 
 	private static int _barrierCounter = 0;
-	private static float _collisionSmallestTime = Float.MAX_VALUE;
+	private static Float _collisionSmallestTime = Float.MAX_VALUE;
 	private static boolean _collisionDetected = false;
+	private float _precisestepTaken = 0f;
 	private static int stepsTaken = 0;
+	private static boolean _isPrecise;
+	private int _numCollisions;
 	private int maxSteps;
+	
 
 	// where do we assign
 	// constructor was set to be private but should be public?
-	public Mover(int threadId, int numThreads, int max) {
+	public Mover(int threadId, int numThreads, int max, boolean precise) {
 		super(threadId, numThreads);
 		maxSteps = max;
+		_isPrecise = precise;
 	}
 
 	@Override
 	public void run() {
-
+		if(_isPrecise)
+			callPreciseAlgorithm();
+		else{
 		while (!_isDone) {
 			calcChanges(CalculationStrategy.ACCEL);
 			barrier();
@@ -45,6 +52,50 @@ public class Mover extends SimulationThread {
 					_isDone = true;
 			}
 		}
+		}
+	}
+
+	private void callPreciseAlgorithm() {
+		while (!_isDone) {
+			
+			
+			calcChanges(CalculationStrategy.ACCEL);
+			barrier();
+			calcChanges(CalculationStrategy.CHECK);
+			barrier();
+			while(_collisionDetected){
+				_collisionSmallestTime = Float.MAX_VALUE;
+				//first time is redundant :/
+				calcChanges(CalculationStrategy.CHECK);
+				barrier();
+				calcChanges(CalculationStrategy.PRECISE);
+				barrier();
+				calcChanges(CalculationStrategy.MOVE);
+				barrier();
+				calcChanges(CalculationStrategy.COLLISION);
+				barrier();
+				if(_threadId == 0 )
+					if(_precisestepTaken > _timestep)
+						_collisionDetected = false;
+				barrier();
+			}
+			_collisionDetected = false;
+			calcChanges(CalculationStrategy.MOVE);
+			barrier();
+			
+			if (_threadId == 0) {
+				// attempt gui update
+				try { UpdateGui(); }
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+				_tk.addTime(_timestep);
+				stepsTaken++;
+				if (maxSteps != 0 && stepsTaken >= maxSteps)
+					_isDone = true;
+			}
+		}
+		
 	}
 
 	private void calcChanges(CalculationStrategy flag) {
@@ -91,6 +142,20 @@ public class Mover extends SimulationThread {
 					}
 				}
 				break;
+			case PRECISE:
+				int count = 0;
+				while(count < b.numCollisions){
+					Body other = b.popBodyOffCollisionStack();
+					double time = b.ComputeCollisionTime(b, other);
+					if(time < _collisionSmallestTime)
+						synchronized(_collisionSmallestTime){
+							if(time < _collisionSmallestTime)
+								_collisionSmallestTime = (float)(time);
+						}
+					b.mapHashString(other, time);
+				}
+						
+				break;
 			default:
 				break;
 			}
@@ -121,7 +186,6 @@ public class Mover extends SimulationThread {
 					_bodies.indexOf(b),
 					_bodies.indexOf(other));
 			_collisionDetected = true;
-
 		}
 		else {
 			b.RemoveFromStillIntersecting(other);

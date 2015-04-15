@@ -20,11 +20,17 @@ public class NBodies {
 		// # of bodies
 		// size of each body (radius)
 		// number of time steps
+		// if calculation is precise
 
 		int numWorkers = Integer.parseInt(args[0]);
 		int numBodies = Integer.parseInt(args[1]);
 		double radius = Double.parseDouble(args[2]);
 		int numSteps = Integer.parseInt(args[3]);
+		int precise = Integer.parseInt(args[4]);
+		boolean prec;
+		if(precise == 0)
+			prec = false;
+		else prec = true;
 		Date startTime, midTime, endTime;
 		ArrayList<Mover> workers = new ArrayList<Mover>();
 
@@ -49,7 +55,7 @@ public class NBodies {
 
 		// create the threads
 		for (int i = 0; i < numWorkers; i++) {
-			workers.add(new Mover(i, numWorkers, numSteps));
+			workers.add(new Mover(i, numWorkers, numSteps, prec));
 		}
 
 		midTime = new Date();

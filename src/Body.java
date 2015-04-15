@@ -29,7 +29,7 @@ public class Body {
 	private double[] normalVector;
 	private double[] tangentVector;
 	public boolean _hasCollided = false;
-	
+	private HashMap<Body, Double> _myCollisions = new HashMap<Body, Double>();
 	
 	
 	public Body(double radius,
@@ -171,13 +171,32 @@ public class Body {
 		return _stackCollision.pop();
 	}
 	
-	public float ComputeCollisionTime(
+	public double ComputeCollisionTime(
 			Body b1,
 			Body b2) {
-		float collide = 0; //?????
-				
-		
-		return collide;
+		// compute quadratic coeffs
+		double a = 0;
+		double b = 0;
+		double c = 0;
+		double d = b1.distance(b2);
+		for(int i = 0; i < DIMENSION; i++){
+			a += b1.velocity[i] * b1.velocity[i]
+					- 2 * b1.velocity[i] * b2.velocity[i]
+					+ b2.velocity[i] * b2.velocity[i];
+			
+			b += 2*b1.velocity[i] * b1.position[i]
+					- 2*b1.velocity[i]*b2.position[i] 
+					- 2*b1.position[i]*b2.velocity[i] 
+					+ 2*b2.velocity[i]*b2.position[i];
+			
+			c += b1.position[i] * b1.position[i]
+					- 2*b1.position[i]*b2.position[i]
+					+ b2.position[i]*b2.position[i];
+		}
+			c -= d*d;
+		double collideSmall = (-b - Math.sqrt(b*b - 4*a*c)) / (2*a);
+		double collideBig = (-b + Math.sqrt(b*b - 4*a*c)) / (2*a);
+		return Math.min(collideSmall, collideBig);
 	}
 
 	 public void computeNormal( Body b){
@@ -447,6 +466,11 @@ public class Body {
 		
 		_stillIntersecting.add(b);
 		b._stillIntersecting.add(this);
+	}
+	
+	public void mapHashString(Body other, Double t){
+				
+		_myCollisions.put(other, t);
 	}
 	
 }
