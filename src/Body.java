@@ -168,6 +168,9 @@ public class Body {
 	}
 	
 	public Body popBodyOffCollisionStack() {
+		if(_stackCollision.isEmpty())
+			return null;
+		
 		return _stackCollision.pop();
 	}
 	
@@ -400,8 +403,10 @@ public class Body {
 	}
 	
 	public void RemoveFromStillIntersecting(Body b) {
-		if(_stillIntersecting.contains(b))
-			_stillIntersecting.remove(b);
+		synchronized(_stillIntersecting) {
+			if(_stillIntersecting.contains(b))
+				_stillIntersecting.remove(b);
+		}
 	}
 	
 	public void ClearAccel()
@@ -412,9 +417,15 @@ public class Body {
 	
 	public void Collide(Body b)
 	{
-		if(_stillIntersecting.contains(b) || b._stillIntersecting.contains(this))
-			return;
+		boolean doNotRepeat = false;
+		synchronized(_stillIntersecting) {
+			doNotRepeat = 
+					_stillIntersecting.contains(b) || b._stillIntersecting.contains(this);
+		}
 		
+		if(doNotRepeat)
+			return;
+			
 		// 1) Find C
 		double dx = b.position[0] - position[0];
 		double dy = b.position[1] - position[1];;
@@ -444,9 +455,11 @@ public class Body {
 		b.velocity[0] = projX + b.velocity[0];
 		b.velocity[1] = projY + b.velocity[1];
 		b.velocity[2] = projZ + b.velocity[2];
-		
-		_stillIntersecting.add(b);
-		b._stillIntersecting.add(this);
+
+		synchronized(_stillIntersecting) {
+			_stillIntersecting.add(b);
+			b._stillIntersecting.add(this);
+		}
 	}
 	
 }

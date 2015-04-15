@@ -6,7 +6,8 @@ if (!Detector.webgl)
 	Detector.addGetWebGLMessage();
 
 
-var container, stats;
+var container;
+//var stats;
 var camera, controls, scene, renderer;
 
 
@@ -17,7 +18,7 @@ render();
 var bodyHash = {};
 
 
-var socket = io.connect('http://localhost');
+var socket = io.connect('http://10.0.0.18/');
 //console.log(socket);
 setupSocketEvents();
 
@@ -39,40 +40,6 @@ function init() {
 	controls.addEventListener( 'change', render );
 
 	scene = new THREE.Scene();
-	//scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
-
-	// world
-	/*
-	var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-	var material =  new THREE.MeshLambertMaterial( { color:0xffffff, shading: THREE.FlatShading } );
-
-	for ( var i = 0; i < 500; i ++ ) {
-
-		var mesh = new THREE.Mesh( geometry, material );
-		mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-		mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-		mesh.position.z = ( Math.random() - 0.5 ) * 1000;
-		mesh.updateMatrix();
-		mesh.matrixAutoUpdate = false;
-		scene.add( mesh );
-
-	}
-	*/
-
-
-	// lights
-	/*
-	light = new THREE.DirectionalLight( 0xffffff );
-	light.position.set( 1, 1, 1 );
-	scene.add( light );
-
-	light = new THREE.DirectionalLight( 0x002288 );
-	light.position.set( -1, -1, -1 );
-	scene.add( light );
-
-	light = new THREE.AmbientLight( 0x222222 );
-	scene.add( light );
-	*/
 
 	// renderer
 
@@ -84,17 +51,21 @@ function init() {
 	container = document.getElementById( 'container' );
 	container.appendChild( renderer.domElement );
 
+/*
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
 	stats.domElement.style.top = '0px';
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
-
+*/
 	//
 
 	window.addEventListener( 'resize', onWindowResize, false );
 
 	animate();
+
+	var frameRate = 33; // milliseconds
+	window.setInterval(render, frameRate);
 
 }
 
@@ -102,7 +73,6 @@ function onWindowResize() {
 
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
-
 	renderer.setSize( window.innerWidth, window.innerHeight );
 
 	render();
@@ -112,14 +82,14 @@ function onWindowResize() {
 function render() {
 
 	renderer.render( scene, camera );
-	stats.update();
+	//stats.update();
 
 }
 
 function addBody(body)
 {
-	var geo = new THREE.SphereGeometry(body.radius, 32, 32);
-	var mat = new THREE.MeshBasicMaterial();
+	var geo = new THREE.SphereGeometry(body.radius, 8, 8);
+    var mat = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 	var mesh = new THREE.Mesh(geo, mat);
 
 	updateBodyPosition(mesh, body);
@@ -136,7 +106,7 @@ function updateBodyPosition(mesh, body)
 
 function setupSocketEvents() {
 	socket.on('gui-update-positions', function(data) {
-		console.log('gui-update-positions');
+		//console.log('gui-update-positions');
 		//console.log(data);
 
 		data.forEach(function(element, index, arr) {
@@ -148,7 +118,7 @@ function setupSocketEvents() {
 		});
 
 		// ensure the gui updates
-		render();
+		//render();
 	});
 }
 
