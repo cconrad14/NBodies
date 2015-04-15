@@ -37,16 +37,19 @@ public class NBodies {
 		// initialize the bodies!!
 		// TODO where do we place these guys??
 		Random r = new Random();
-		int sign = 1;
+		double vsign = 0.0;
+		double psign = 2;
 		for (int i = 0; i < numBodies; i++) { // reassign positions?
 			SimulationThread.setBodies(new Body(radius,
-				r.nextDouble() * 100 * sign,
-				r.nextDouble() * 100 * (-sign),
-				r.nextDouble() * 100 * (-sign),
-				r.nextDouble() * 100 * sign,
-				r.nextDouble() * 100 * (-sign),
-				r.nextDouble() * 100 * sign));
-			sign *= -1;
+				r.nextDouble() * 100 * vsign,
+				r.nextDouble() * 100 * (-vsign),
+				r.nextDouble() * 100 * (-vsign),
+				//0,0,0,
+				r.nextDouble() * 100 * psign,
+				r.nextDouble() * 100 * (-psign),
+				r.nextDouble() * 100 * psign));
+			vsign *= -1;
+			psign *= -1;
 		}
 		
 		ArrayList<Body> bodies = SimulationThread.getBodies();

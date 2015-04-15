@@ -1,3 +1,5 @@
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,7 +9,8 @@ import org.json.JSONObject;
 public class Mover extends SimulationThread {
 
 	private static int _barrierCounter = 0;
-	private static Float _collisionSmallestTime = Float.MAX_VALUE;
+	private static final boolean REAL_TIME = true;
+	private static float _collisionSmallestTime = Float.MAX_VALUE;
 	private static boolean _collisionDetected = false;
 	private float _precisestepTaken = 0f;
 	private static int stepsTaken = 0;
@@ -26,10 +29,18 @@ public class Mover extends SimulationThread {
 
 	@Override
 	public void run() {
+<<<<<<< HEAD
 		if(_isPrecise)
 			callPreciseAlgorithm();
 		else{
+=======
+
+		long nano = 0;
+>>>>>>> 9751e8a8a7aaf6a118cf08ecdcfb676a4f3f8612
 		while (!_isDone) {
+			if(_threadId == 0)
+				nano = System.nanoTime();
+			
 			calcChanges(CalculationStrategy.ACCEL);
 			barrier();
 			calcChanges(CalculationStrategy.CHECK);
@@ -46,6 +57,20 @@ public class Mover extends SimulationThread {
 				catch(Exception e) {
 					e.printStackTrace();
 				}
+				
+				// compute whether we should sleep so we update in real time
+				nano = System.nanoTime() - nano;
+				double executionFraction = nano / 1000000000.0;
+				long sleepMillis = (long)((_timestep - executionFraction) * 1000);
+				if(sleepMillis > 0 && REAL_TIME) {
+					try {
+						Thread.sleep(sleepMillis);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
 				_tk.addTime(_timestep);
 				stepsTaken++;
 				if (maxSteps != 0 && stepsTaken >= maxSteps)
@@ -130,15 +155,14 @@ public class Mover extends SimulationThread {
 				double[] his = new double[3];
 				if(_collisionDetected){
 					Body other = b.popBodyOffCollisionStack();
-					for(int j = 0; j < 3; j++){
-						mine[i] = b.velocity[i];
-						his[i] = other.velocity[i];
-					}
-					boolean doCollision = SimulationThread.checkCollision(
-							_bodies.indexOf(b),	_bodies.indexOf(other)); 
-					if (doCollision) {
-						//b.CcomputeCollision(other);
-						b.Collide(other);
+					while(other != null) {
+						boolean doCollision = SimulationThread.checkCollision(
+								_bodies.indexOf(b),	_bodies.indexOf(other)); 
+						if (doCollision) {
+							//b.CcomputeCollision(other);
+							b.Collide(other);
+						}
+						other = b.popBodyOffCollisionStack();
 					}
 				}
 				break;
@@ -194,18 +218,20 @@ public class Mover extends SimulationThread {
 		return _collisionDetected;
 	}
 
-	synchronized private void barrier() {
-		_barrierCounter++;
-		if (_barrierCounter < _numThreads)
-			try {
-				wait();
-			} catch (InterruptedException ie) {
-				System.out.print(ie.getStackTrace());
-				System.exit(_threadId);
+	private void barrier() {
+		synchronized(_tk) {
+			_barrierCounter++;
+			if (_barrierCounter < _numThreads)
+				try {
+					_tk.wait();
+				} catch (InterruptedException ie) {
+					System.out.print(ie.getStackTrace());
+					System.exit(_threadId);
+				}
+			else {
+				_barrierCounter = 0;
+				_tk.notifyAll();
 			}
-		else {
-			_barrierCounter = 0;
-			notifyAll();
 		}
 	}
 

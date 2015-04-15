@@ -14,8 +14,10 @@ public abstract class SimulationThread implements Runnable {
 	protected static long _currentFrame = -1;
 	protected static TimeKeeper _tk;
 	protected static HashMap<String, Boolean> _collisionMap;
+	protected static int _barrierCounter;
 	
 	static {
+		_barrierCounter = 0;
 		_bodies = new ArrayList<Body>();
 		_sems = new ArrayList<Semaphore>();
 		_tk = new TimeKeeper();
