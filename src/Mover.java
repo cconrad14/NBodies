@@ -100,6 +100,7 @@ public class Mover extends SimulationThread {
 	}
 
 	private void ComputeAcceleration(Body b) {
+		b.ClearAccel();
 		for (Body other : _bodies) {
 			double dist = b.distance(other);
 
