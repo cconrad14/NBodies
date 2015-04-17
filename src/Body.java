@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public class Body {
 
 	private double radius = 1;
-	private double mass = 0.01;
+	private double mass = 10000000000000.0;
 	private UUID _id = UUID.randomUUID();
 	
 	private final static int DIMENSION = 3;
@@ -148,6 +148,9 @@ public class Body {
 	
 	public void updateTimestepAccel(Body other) {
 		double d = distance(other);
+		
+		if(StillIntersecting(other))
+			return;
 		
 		for(int i = 0; i < 3; i++) {
 			double a = Constants.G * other.mass * (other.position[i] - position[i]);
@@ -437,6 +440,17 @@ public class Body {
 	{
 		for(int i = 0; i < DIMENSION; i++)
 			deltaAccel[i] = 0.0;
+	}
+	
+	public boolean StillIntersecting(Body other)
+	{
+		boolean still = false;
+		synchronized(_stillIntersecting) {
+			still = 
+					_stillIntersecting.contains(other) || other._stillIntersecting.contains(this);
+		}
+		
+		return still;
 	}
 	
 	public void Collide(Body b)
