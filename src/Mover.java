@@ -133,6 +133,8 @@ public class Mover extends SimulationThread {
 				stepsTaken++;
 				if (maxSteps != 0 && stepsTaken >= maxSteps)
 					_isDone = true;
+				
+				System.out.println("frame: " + stepsTaken);
 			}
 		}
 		

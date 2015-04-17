@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public class Body {
 
 	private double radius = 1;
-	private double mass = 50000000000000.0;
+	private double mass = 0.01;
 	private UUID _id = UUID.randomUUID();
 	
 	private final static int DIMENSION = 3;
@@ -449,7 +449,14 @@ public class Body {
 		
 		if(doNotRepeat)
 			return;
-			
+		
+		boolean debug = false;
+		
+		if(debug) {
+			System.out.println("collision! ID's are " + b._id + "," + this._id);
+			System.out.println("D=" + String.valueOf(this.distance(b)));
+		}
+		
 		// 1) Find C
 		double dx = b.position[0] - position[0];
 		double dy = b.position[1] - position[1];;
@@ -474,6 +481,13 @@ public class Body {
 		double projY = boostY * dy;
 		double projZ = boostZ * dz;
 		
+		// debug printing
+		if(debug) {
+			System.out.println("before");
+			b.PrintVelocity();
+			this.PrintVelocity();
+		}
+		
 		// 4) do final assignment
 		velocity[0] = boostX - projX;
 		velocity[1] = boostY - projY;
@@ -482,6 +496,15 @@ public class Body {
 		b.velocity[1] = projY;
 		b.velocity[2] = projZ;
 
+
+		// debug printing
+		if(debug) {
+			System.out.println("after");
+			b.PrintVelocity();
+			this.PrintVelocity();	
+		}
+		
+		
 		synchronized(_stillIntersecting) {
 			_stillIntersecting.add(b);
 			b._stillIntersecting.add(this);
@@ -495,6 +518,16 @@ public class Body {
 	
 	public boolean checkStack(){
 		return !_stackCollision.empty();
+	}
+	
+	public void PrintVelocity() {
+		String str = "" + _id;
+		
+		str += "\n\tv[0] = " + String.valueOf(velocity[0]);
+		str += "\n\tv[1] = " + String.valueOf(velocity[1]);
+		str += "\n\tv[2] = " + String.valueOf(velocity[2]);
+		
+		System.out.println(str);
 	}
 
 	

@@ -17,7 +17,7 @@ public class GuiCommunication {
 	{
 		try {
 			// attempt to create socket
-			_socket = IO.socket("http://localhost");
+			_socket = IO.socket(URL);
 			
 			// chain new events here
 			_socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
@@ -37,5 +37,9 @@ public class GuiCommunication {
 	public static void Send(String event, Object obj)
 	{
 		_socket.emit(event, obj);
+	}
+	
+	public static void SendGuiUpdate(Object obj) {
+		 _socket.emit(GUI_UPDATE, obj);
 	}
 }
