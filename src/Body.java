@@ -450,7 +450,7 @@ public class Body {
 		if(doNotRepeat)
 			return;
 		
-		boolean debug = false;
+		boolean debug = true;
 		
 		if(debug) {
 			System.out.println("collision! ID's are " + b._id + "," + this._id);
@@ -477,9 +477,14 @@ public class Body {
 		double boostZ = velocity[2] - b.velocity[2];
 		
 		// project boost onto c
+		
 		double projX = boostX * dx;
 		double projY = boostY * dy;
 		double projZ = boostZ * dz;
+		double dotproduct = projX + projY + projZ;
+		projX = dx * dotproduct;
+		projY = dy * dotproduct;
+		projZ = dz * dotproduct;
 		
 		// debug printing
 		if(debug) {
@@ -489,12 +494,12 @@ public class Body {
 		}
 		
 		// 4) do final assignment
-		velocity[0] = boostX - projX;
-		velocity[1] = boostY - projY;
-		velocity[2] = boostZ - projZ;
-		b.velocity[0] = projX;
-		b.velocity[1] = projY;
-		b.velocity[2] = projZ;
+		velocity[0] = boostX - projX + b.velocity[0];
+		velocity[1] = boostY - projY + b.velocity[1];
+		velocity[2] = boostZ - projZ + b.velocity[2];
+		b.velocity[0] = projX + b.velocity[0];
+		b.velocity[1] = projY + b.velocity[1];
+		b.velocity[2] = projZ + b.velocity[2];
 
 
 		// debug printing
