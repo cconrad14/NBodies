@@ -8,24 +8,13 @@ import java.util.Random;
 
 public class TwoBodies {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		import java.io.File;
-		import java.io.FileNotFoundException;
-		import java.io.FileOutputStream;
-		import java.io.PrintWriter;
-		import java.util.concurrent.Semaphore;
-		import java.util.ArrayList;
-		import java.util.Date;
-		import java.util.Random;
-		import java.util.concurrent.Semaphore;
 
 		// do graphical interface in browser with javascript?
 		// add charge as an additional force
 		// 3-D
 		// performance analysis
 		// 
-		public class NBodies {
+		
 
 			public static void main(String[] args) {
 				// args: # of workers, ignored by sequential solution
@@ -38,18 +27,18 @@ public class TwoBodies {
 				int numBodies = Integer.parseInt(args[1]);
 				double radius = Double.parseDouble(args[2]);
 				int numSteps = Integer.parseInt(args[3]);
-				//int precise = Integer.parseInt(args[4]);
-				//boolean prec;
-				//if(precise == 0)
-				//	prec = false;
-				//else prec = true;
+				int precise = Integer.parseInt(args[4]);
+				boolean prec;
+				if(precise == 0)
+					prec = false;
+				else prec = true;
 				Date startTime, midTime, endTime;
 				ArrayList<Mover> workers = new ArrayList<Mover>();
 
 				// initialize the bodies!!
 				// TODO where do we place these guys??
-					SimulationThread.setBodies(new Body(radius, 0.0,0.0,0.0, -10.0, 0.0, 0.0));
-					SimulationThread.setBodies(new Body(radius, 0.0,0.0,0.0, 10.0, 0.0, 0.0));
+					SimulationThread.setBodies(new Body(radius, 5.0,0.0,0.0, -10.0, 0.0, 0.0));
+					SimulationThread.setBodies(new Body(radius, -5.0,0.0,0.0, 10.0, 0.0, 0.0));
 				
 				
 				ArrayList<Body> bodies = SimulationThread.getBodies();
@@ -58,7 +47,7 @@ public class TwoBodies {
 
 				// create the threads
 				for (int i = 0; i < numWorkers; i++) {
-					workers.add(new Mover(i, numWorkers, numSteps, false));
+					workers.add(new Mover(i, numWorkers, numSteps, prec));
 				}
 
 				midTime = new Date();
@@ -136,8 +125,8 @@ public class TwoBodies {
 				}
 			}
 			
-		}
+		
 
-	}
+	
 
 }

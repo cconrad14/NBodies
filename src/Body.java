@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public class Body {
 
 	private double radius = 1;
-	private double mass = 50000000.0;
+	private double mass = 50000000000000.0;
 	private UUID _id = UUID.randomUUID();
 	
 	private final static int DIMENSION = 3;
@@ -156,6 +156,7 @@ public class Body {
 	}
 	
 	public void move(double timeStep){
+		double temp;
 		for(int i = 0; i < 3; i++){
 			prevPosition[i] = position[i];
 			position[i] = position[i] + velocity[i] * timeStep + deltaAccel[i] * timeStep * timeStep * .5;
@@ -187,6 +188,19 @@ public class Body {
 					- 2 * b1.velocity[i] * b2.velocity[i]
 					+ b2.velocity[i] * b2.velocity[i];
 			
+			b += 2*b1.velocity[i] * b1.prevPosition[i]
+					- 2*b1.velocity[i]*b2.prevPosition[i] 
+					- 2*b1.prevPosition[i]*b2.velocity[i] 
+					+ 2*b2.velocity[i]*b2.prevPosition[i];
+			
+			c += b1.prevPosition[i] * b1.prevPosition[i]
+					- 2*b1.prevPosition[i]*b2.prevPosition[i]
+					+ b2.prevPosition[i]*b2.prevPosition[i];
+			
+			/*a += b1.velocity[i] * b1.velocity[i]
+					- 2 * b1.velocity[i] * b2.velocity[i]
+					+ b2.velocity[i] * b2.velocity[i];
+			
 			b += 2*b1.velocity[i] * b1.position[i]
 					- 2*b1.velocity[i]*b2.position[i] 
 					- 2*b1.position[i]*b2.velocity[i] 
@@ -194,7 +208,8 @@ public class Body {
 			
 			c += b1.position[i] * b1.position[i]
 					- 2*b1.position[i]*b2.position[i]
-					+ b2.position[i]*b2.position[i];
+					+ b2.position[i]*b2.position[i]; */
+			
 		}
 			c -= d*d;
 		double collideSmall = (-b - Math.sqrt(b*b - 4*a*c)) / (2*a);
@@ -485,5 +500,10 @@ public class Body {
 				
 		_myCollisions.put(other, t);
 	}
+	
+	public boolean checkStack(){
+		return !_stackCollision.empty();
+	}
+
 	
 }

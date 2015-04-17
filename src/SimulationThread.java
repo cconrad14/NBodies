@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 import java.util.concurrent.Semaphore;
 
 
@@ -15,6 +16,7 @@ public abstract class SimulationThread implements Runnable {
 	protected static TimeKeeper _tk;
 	protected static HashMap<String, Boolean> _collisionMap;
 	protected static int _barrierCounter;
+	protected static Stack<Body> _hasSmallestTime = new Stack<Body>();
 	
 	static {
 		_barrierCounter = 0;

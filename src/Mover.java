@@ -18,6 +18,7 @@ public class Mover extends SimulationThread {
 	private int _numCollisions;
 	private int maxSteps;
 	
+	
 
 	// where do we assign
 	// constructor was set to be private but should be public?
@@ -78,14 +79,17 @@ public class Mover extends SimulationThread {
 	}
 
 	private void callPreciseAlgorithm() {
+		long nano = 0;
 		while (!_isDone) {
 			
-			long nano = 0;
+			if(_threadId == 0)
+				nano = System.nanoTime();
 			calcChanges(CalculationStrategy.ACCEL);
 			barrier();
 			calcChanges(CalculationStrategy.CHECK);
 			barrier();
 			while(_collisionDetected){
+				_collisionDetected = false;
 				_collisionSmallestTime = Float.MAX_VALUE;
 				//first time is redundant :/
 				calcChanges(CalculationStrategy.CHECK);
@@ -96,9 +100,11 @@ public class Mover extends SimulationThread {
 				barrier();
 				calcChanges(CalculationStrategy.COLLISION);
 				barrier();
-				if(_threadId == 0 )
+				if(_threadId == 0 ){
+					_precisestepTaken += _collisionSmallestTime;
 					if(_precisestepTaken > _timestep)
 						_collisionDetected = false;
+				}
 				barrier();
 			}
 			_collisionDetected = false;
@@ -147,7 +153,10 @@ public class Mover extends SimulationThread {
 				ComputeAcceleration(b);
 				break;
 			case MOVE:
-				b.move(_timestep);
+				if(_isPrecise && _collisionDetected)
+					b.move(_collisionSmallestTime);
+				else 
+					b.move(_timestep);
 				break;
 			case CHECK:
 				for (Body other : _bodies) {
@@ -157,13 +166,23 @@ public class Mover extends SimulationThread {
 													// n(n+1)/2 too many
 													// collision checks.
 					// TODO reduce the number of repeated checks
+					
 				}
 				break;
 			case COLLISION:
-				double[] mine = new double[3];
-				double[] his = new double[3];
-				if(_collisionDetected){
-					Body other = b.popBodyOffCollisionStack();
+				if(_collisionDetected && !_hasSmallestTime.empty()){
+					Body other, first, second;
+					if(_isPrecise){
+						first = _hasSmallestTime.pop();
+						second = _hasSmallestTime.pop();
+						boolean doCollision = SimulationThread.checkCollision(
+								_bodies.indexOf(first),	_bodies.indexOf(second)); 
+						if (doCollision) {
+							first.Collide(second);
+						}
+						break;
+					}
+					other = b.popBodyOffCollisionStack();
 					while(other != null) {
 						boolean doCollision = SimulationThread.checkCollision(
 								_bodies.indexOf(b),	_bodies.indexOf(other)); 
@@ -171,19 +190,29 @@ public class Mover extends SimulationThread {
 							//b.CcomputeCollision(other);
 							b.Collide(other);
 						}
-						other = b.popBodyOffCollisionStack();
+						
 					}
+					
 				}
 				break;
 			case PRECISE:
-				int count = 0;
-				while(count < b.numCollisions){
-					Body other = b.popBodyOffCollisionStack();
+				
+				Body winning1, winning2, other;
+				while(b.checkStack()){
+					 other = b.popBodyOffCollisionStack();
+					
 					double time = b.ComputeCollisionTime(b, other);
 					if(time < _collisionSmallestTime)
 						synchronized(_collisionSmallestTime){
-							if(time < _collisionSmallestTime)
+							if(time < _collisionSmallestTime){
 								_collisionSmallestTime = (float)(time);
+								if(!_hasSmallestTime.empty()){
+									_hasSmallestTime.pop();
+									_hasSmallestTime.pop();
+								}
+								_hasSmallestTime.push(b);
+								_hasSmallestTime.push(other);
+							}
 						}
 					b.mapHashString(other, time);
 				}
@@ -213,6 +242,7 @@ public class Mover extends SimulationThread {
 
 		double dist = b.distance(other);
 		if (dist < b.getRadius() + other.getRadius()) {
+			b.numCollisions++;
 			b._hasCollided = true;
 			b.pushBodyOnCollisionStack(other);
 			SimulationThread.addToMap(

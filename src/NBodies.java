@@ -48,8 +48,8 @@ public class NBodies {
 				r.nextDouble() * 100 * psign,
 				r.nextDouble() * 100 * (-psign),
 				r.nextDouble() * 100 * psign));
-			vsign *= -1;
-			psign *= -1;
+				vsign *= -1;
+				psign *= -1;
 		}
 		
 		ArrayList<Body> bodies = SimulationThread.getBodies();
@@ -86,18 +86,20 @@ public class NBodies {
 		endTime = new Date();
 		double end = endTime.getTime();
 		
-		System.out.println("start time = " + start);
-		System.out.println("end time =   " + end);
 		
 		end = end - start;
+		mid = mid - start;
 		double seconds = Math.floor(end * .001);
+		double midSec = Math.floor(mid * .001);
 		end = end - (seconds * 1000);
+		mid = mid - (midSec * 1000);
 		
 		int collisions = 0;
 		for (int i = 0; i < numBodies; i++)
 			collisions += bodies.get(1).numCollisions / 2;
 
 		// TODO do some output bro!
+		System.out.println("thread creation time: " + midSec + " seconds " + mid + " milliseconds");
 		System.out.println("computation time: " + seconds + " seconds " + end
 				+ " milliseconds");
 		System.out.println(collisions + " total collisions");
