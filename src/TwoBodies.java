@@ -37,8 +37,8 @@ public class TwoBodies {
 
 				// initialize the bodies!!
 				// TODO where do we place these guys??
-					SimulationThread.setBodies(new Body(radius, 5.0,0.0,0.0, -10.0, 0.0, 0.0));
-					SimulationThread.setBodies(new Body(radius, -5.0,0.0,0.0, 10.0, 0.0, 0.0));
+					SimulationThread.setBodies(new Body(radius, 5.0,5.0,5.0, -10.0, -10.0, -10.0));
+					SimulationThread.setBodies(new Body(radius, -5.0,-5.0,-5.0, 10.0, 10.0, 10.0));
 				
 				
 				ArrayList<Body> bodies = SimulationThread.getBodies();

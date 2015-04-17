@@ -170,9 +170,9 @@ public class Mover extends SimulationThread {
 				}
 				break;
 			case COLLISION:
-				if(_collisionDetected && !_hasSmallestTime.empty()){
+				if(_collisionDetected ){
 					Body other, first, second;
-					if(_isPrecise){
+					if(_isPrecise && !_hasSmallestTime.empty()){
 						first = _hasSmallestTime.pop();
 						second = _hasSmallestTime.pop();
 						boolean doCollision = SimulationThread.checkCollision(
@@ -182,8 +182,8 @@ public class Mover extends SimulationThread {
 						}
 						break;
 					}
-					other = b.popBodyOffCollisionStack();
-					while(other != null) {
+					while(b.checkStack()){
+						other = b.popBodyOffCollisionStack();
 						boolean doCollision = SimulationThread.checkCollision(
 								_bodies.indexOf(b),	_bodies.indexOf(other)); 
 						if (doCollision) {
