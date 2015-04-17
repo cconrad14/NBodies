@@ -475,12 +475,12 @@ public class Body {
 		double projZ = boostZ * dz;
 		
 		// 4) do final assignment
-		velocity[0] = boostX - projX + b.velocity[0];
-		velocity[1] = boostY - projY + b.velocity[1];
-		velocity[2] = boostZ - projZ + b.velocity[2];
-		b.velocity[0] = projX + b.velocity[0];
-		b.velocity[1] = projY + b.velocity[1];
-		b.velocity[2] = projZ + b.velocity[2];
+		velocity[0] = boostX - projX;
+		velocity[1] = boostY - projY;
+		velocity[2] = boostZ - projZ;
+		b.velocity[0] = projX;
+		b.velocity[1] = projY;
+		b.velocity[2] = projZ;
 
 		synchronized(_stillIntersecting) {
 			_stillIntersecting.add(b);
