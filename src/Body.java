@@ -158,9 +158,10 @@ public class Body {
 	public void move(double timeStep){
 		double temp;
 		for(int i = 0; i < 3; i++){
+			
 			prevPosition[i] = position[i];
 			position[i] = position[i] + velocity[i] * timeStep + deltaAccel[i] * timeStep * timeStep * .5;
-			velocity[i] += deltaAccel[i];
+			velocity[i] += deltaAccel[i] * timeStep;
 		}
 	}
 	
@@ -197,18 +198,7 @@ public class Body {
 					- 2*b1.prevPosition[i]*b2.prevPosition[i]
 					+ b2.prevPosition[i]*b2.prevPosition[i];
 			
-			/*a += b1.velocity[i] * b1.velocity[i]
-					- 2 * b1.velocity[i] * b2.velocity[i]
-					+ b2.velocity[i] * b2.velocity[i];
 			
-			b += 2*b1.velocity[i] * b1.position[i]
-					- 2*b1.velocity[i]*b2.position[i] 
-					- 2*b1.position[i]*b2.velocity[i] 
-					+ 2*b2.velocity[i]*b2.position[i];
-			
-			c += b1.position[i] * b1.position[i]
-					- 2*b1.position[i]*b2.position[i]
-					+ b2.position[i]*b2.position[i]; */
 			
 		}
 			c -= d*d;
@@ -470,6 +460,8 @@ public class Body {
 		dx *= mag;
 		dy *= mag;
 		dz *= mag;
+		
+		double unitCheck = Math.sqrt(dx*dx + dy*dy + dz*dz);
 		
 		// 3) Project this.v onto c in coord frame where b.v = 0
 		// create boost vector
