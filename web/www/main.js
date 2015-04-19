@@ -18,7 +18,7 @@ render();
 var bodyHash = {};
 
 
-var socket = io.connect('http://10.0.0.18');
+var socket = io.connect('http://localhost');
 //console.log(socket);
 setupSocketEvents();
 

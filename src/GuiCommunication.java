@@ -4,7 +4,7 @@ import com.github.nkzawa.socketio.client.IO;
 
 public class GuiCommunication {
 	
-	public static final String URL = "http://localhost";
+	public static final String URL = "http://localhost/";
 	public static final String GUI_UPDATE = "update";
 	private static Socket _socket;
 	
